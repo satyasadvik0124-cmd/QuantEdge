@@ -116,17 +116,20 @@ for _, signal in signals_df.iterrows():
     # ==================================
     # SAVE RESULT
     # ==================================
+risk = abs(entry - sl)
+reward = abs(tp - entry)
 
-    results.append({
-        "signal_time": signal_time,
-        "direction": direction,
+rr = round(reward / risk, 2)
 
-        "entry": entry,
-        "sl": sl,
-        "tp": tp,
-
-        "result": result
-    })
+results.append({
+    "signal_time": signal_time,
+    "direction": direction,
+    "entry": entry,
+    "sl": sl,
+    "tp": tp,
+    "result": result,
+    "rr": rr if result == "WIN" else -1
+})
 
 # ==================================
 # RESULTS DATAFRAME
