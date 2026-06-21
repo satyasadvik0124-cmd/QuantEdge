@@ -1,13 +1,56 @@
 import pandas as pd
+import sys
+import os
+
+sys.path.append(
+    os.path.dirname(
+        os.path.dirname(__file__)
+    )
+)
+
+from config import PAIR, TIMEFRAME
+
+print(f"\nUsing: {PAIR}_{TIMEFRAME}")
 
 # ==================================
-# LOAD DATA
+# LOAD PRICE DATA
 # ==================================
 
-price_df = pd.read_csv("../data/EURUSD_M15.csv")
-signals_df = pd.read_csv("../outputs/signals_v2.csv")
+price_df = pd.read_csv(
+    f"../data/{PAIR}_{TIMEFRAME}.csv"
+)
 
-price_df["time"] = pd.to_datetime(price_df["time"])
+price_df["time"] = pd.to_datetime(
+    price_df["time"]
+)
+
+# ==================================
+# LOAD SIGNALS
+# ==================================
+
+signals_file = "../outputs/signals_v3.csv"
+
+if not os.path.exists(signals_file):
+
+    print("No signals file found.")
+    exit()
+
+try:
+
+    signals_df = pd.read_csv(
+        signals_file
+    )
+
+except pd.errors.EmptyDataError:
+
+    print("No signals generated.")
+    exit()
+
+if signals_df.empty:
+
+    print("No signals generated.")
+    exit()
+
 signals_df["signal_time"] = pd.to_datetime(
     signals_df["signal_time"]
 )
@@ -30,10 +73,6 @@ for _, signal in signals_df.iterrows():
     sl = signal["sl"]
     tp = signal["tp"]
 
-    # ----------------------------------
-    # Find signal candle index
-    # ----------------------------------
-
     signal_rows = price_df[
         price_df["time"] == signal_time
     ]
@@ -46,7 +85,7 @@ for _, signal in signals_df.iterrows():
     result = "OPEN"
 
     # ==================================
-    # BUY SIGNAL
+    # BUY
     # ==================================
 
     if direction == "BUY":
@@ -55,7 +94,6 @@ for _, signal in signals_df.iterrows():
 
             candle = price_df.iloc[i]
 
-            # Stop Loss hit
             if candle["low"] <= sl:
 
                 result = "LOSS"
@@ -67,7 +105,6 @@ for _, signal in signals_df.iterrows():
 
                 break
 
-            # Take Profit hit
             if candle["high"] >= tp:
 
                 result = "WIN"
@@ -80,7 +117,7 @@ for _, signal in signals_df.iterrows():
                 break
 
     # ==================================
-    # SELL SIGNAL
+    # SELL
     # ==================================
 
     elif direction == "SELL":
@@ -89,7 +126,6 @@ for _, signal in signals_df.iterrows():
 
             candle = price_df.iloc[i]
 
-            # Stop Loss hit
             if candle["high"] >= sl:
 
                 result = "LOSS"
@@ -101,7 +137,6 @@ for _, signal in signals_df.iterrows():
 
                 break
 
-            # Take Profit hit
             if candle["low"] <= tp:
 
                 result = "WIN"
@@ -116,20 +151,25 @@ for _, signal in signals_df.iterrows():
     # ==================================
     # SAVE RESULT
     # ==================================
-risk = abs(entry - sl)
-reward = abs(tp - entry)
 
-rr = round(reward / risk, 2)
+    risk = abs(entry - sl)
 
-results.append({
-    "signal_time": signal_time,
-    "direction": direction,
-    "entry": entry,
-    "sl": sl,
-    "tp": tp,
-    "result": result,
-    "rr": rr if result == "WIN" else -1
-})
+    reward = abs(tp - entry)
+
+    rr = round(
+        reward / risk,
+        2
+    )
+
+    results.append({
+        "signal_time": signal_time,
+        "direction": direction,
+        "entry": entry,
+        "sl": sl,
+        "tp": tp,
+        "result": result,
+        "rr": rr if result == "WIN" else -1
+    })
 
 # ==================================
 # RESULTS DATAFRAME
@@ -169,7 +209,10 @@ total = len(results_df)
 win_rate = 0
 
 if total > 0:
-    win_rate = (wins / total) * 100
+
+    win_rate = (
+        wins / total
+    ) * 100
 
 # ==================================
 # SUMMARY

@@ -1,7 +1,25 @@
 import pandas as pd
+import sys
+import os
 
-df = pd.read_csv("../data/EURUSD_M15.csv")
+sys.path.append(
+    os.path.dirname(
+        os.path.dirname(__file__)
+    )
+)
 
+from config import PAIR, TIMEFRAME
+
+print(f"\nUsing: {PAIR}_{TIMEFRAME}")
+
+from config import PAIR, TIMEFRAME
+
+df = pd.read_csv(
+    f"../data/{PAIR}_{TIMEFRAME}.csv"
+)
+print(df.head())
+print()
+print(df[["high", "low"]].head())
 swing_highs = []
 swing_lows = []
 

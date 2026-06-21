@@ -5,7 +5,7 @@ files = {
     "Validated Sweeps": "../outputs/validated_sweeps_v2.csv",
     "Order Blocks": "../outputs/order_blocks_v1.csv",
     "FVGs": "../outputs/fvg_v2.csv",
-    "Signals": "../outputs/signals_v2.csv",
+    "Signals": "../outputs/signals_v3.csv",
     "Backtest Trades": "../outputs/backtest_results_v1.csv"
 }
 
@@ -19,11 +19,7 @@ for name, path in files.items():
 
     try:
         df = pd.read_csv(path)
-
         print(f"{name:<20}: {len(df)}")
-
-        print(f"Columns: {list(df.columns)}")
-        print()
 
     except Exception as e:
         print(f"{name:<20}: ERROR -> {e}")

@@ -1,11 +1,25 @@
 import pandas as pd
+import sys
+import os
 
-# ==========================
-# LOAD FILES
-# ==========================
+sys.path.append(
+    os.path.dirname(
+        os.path.dirname(__file__)
+    )
+)
 
-df = pd.read_csv("../data/EURUSD_M15.csv")
-structure = pd.read_csv("../outputs/market_structure_v4.csv")
+from config import PAIR, TIMEFRAME
+
+print(f"\nUsing: {PAIR}_{TIMEFRAME}")
+
+df = pd.read_csv(
+    f"../data/{PAIR}_{TIMEFRAME}.csv"
+)
+
+structure = pd.read_csv(
+    "../outputs/market_structure_v4.csv"
+)
+
 print("\n===== CHOCH V3 =====\n")
 
 trend = None
@@ -123,7 +137,14 @@ for i in range(len(structure)):
 # SAVE CHOCH EVENTS
 # ==========================
 
-choch_df = pd.DataFrame(choch_events)
+choch_df = pd.DataFrame(
+    choch_events,
+    columns=[
+        "time",
+        "type",
+        "price"
+    ]
+)
 
 choch_df.to_csv(
     "../outputs/choch_events.csv",

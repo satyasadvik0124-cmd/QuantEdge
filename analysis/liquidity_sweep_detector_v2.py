@@ -1,17 +1,37 @@
 import pandas as pd
+import os
 
 # ==================================
 # CONFIG
 # ==================================
 
-LOOKAHEAD_HOURS = 5
+LOOKAHEAD_HOURS = 24
 
 # ==================================
 # LOAD DATA
 # ==================================
 
-sweeps_df = pd.read_csv("liquidity_sweeps_v1.csv")
-choch_df = pd.read_csv("choch_events.csv")
+sweeps_file = "../outputs/liquidity_sweeps_v1.csv"
+choch_file = "../outputs/choch_events.csv"
+
+if not os.path.exists(sweeps_file):
+    print(f"Missing: {sweeps_file}")
+    exit()
+
+if not os.path.exists(choch_file):
+    print(f"Missing: {choch_file}")
+    exit()
+
+sweeps_df = pd.read_csv(sweeps_file)
+choch_df = pd.read_csv(choch_file)
+
+if sweeps_df.empty:
+    print("No liquidity sweeps found.")
+    exit()
+
+if choch_df.empty:
+    print("No CHOCH events found.")
+    exit()
 
 sweeps_df["time"] = pd.to_datetime(sweeps_df["time"])
 choch_df["time"] = pd.to_datetime(choch_df["time"])
@@ -27,7 +47,9 @@ for _, sweep in sweeps_df.iterrows():
     sweep_time = sweep["time"]
     sweep_type = sweep["type"]
 
-    window_end = sweep_time + pd.Timedelta(hours=LOOKAHEAD_HOURS)
+    window_end = sweep_time + pd.Timedelta(
+        hours=LOOKAHEAD_HOURS
+    )
 
     future_choch = choch_df[
         (choch_df["time"] > sweep_time)
@@ -42,7 +64,8 @@ for _, sweep in sweeps_df.iterrows():
     if sweep_type == "BSL_SWEEP":
 
         bearish_choch = future_choch[
-            future_choch["type"] == "BEARISH_CHOCH"
+            future_choch["type"]
+            == "BEARISH_CHOCH"
         ]
 
         if not bearish_choch.empty:
@@ -56,12 +79,6 @@ for _, sweep in sweeps_df.iterrows():
                 "price": sweep["price"]
             })
 
-            print(
-                f"VALID_BEARISH_SWEEP | "
-                f"Sweep: {sweep_time} | "
-                f"CHOCH: {choch['time']}"
-            )
-
     # ----------------------------------
     # SSL Sweep -> Bullish CHOCH
     # ----------------------------------
@@ -69,7 +86,8 @@ for _, sweep in sweeps_df.iterrows():
     elif sweep_type == "SSL_SWEEP":
 
         bullish_choch = future_choch[
-            future_choch["type"] == "BULLISH_CHOCH"
+            future_choch["type"]
+            == "BULLISH_CHOCH"
         ]
 
         if not bullish_choch.empty:
@@ -83,21 +101,28 @@ for _, sweep in sweeps_df.iterrows():
                 "price": sweep["price"]
             })
 
-            print(
-                f"VALID_BULLISH_SWEEP | "
-                f"Sweep: {sweep_time} | "
-                f"CHOCH: {choch['time']}"
-            )
-
 # ==================================
-# SAVE RESULTS
+# SAVE
 # ==================================
 
-validated_df = pd.DataFrame(validated_sweeps)
+validated_df = pd.DataFrame(
+    validated_sweeps
+)
+
+if not validated_df.empty:
+
+    validated_df = validated_df.drop_duplicates(
+        subset=["sweep_time", "type"]
+    )
 
 validated_df.to_csv(
-    "validated_sweeps_v1.csv",
+    "../outputs/validated_sweeps_v1.csv",
     index=False
 )
 
-print("\nValidated Sweeps:", len(validated_df))
+# ==================================
+# SUMMARY
+# ==================================
+
+print("\nTotal Validated Sweeps:", len(validated_df))
+print("Saved: ../outputs/validated_sweeps_v1.csv")

@@ -1,10 +1,24 @@
 import pandas as pd
+import sys
+import os
 
+sys.path.append(
+    os.path.dirname(
+        os.path.dirname(__file__)
+    )
+)
+
+from config import PAIR, TIMEFRAME
+
+print(f"\nUsing: {PAIR}_{TIMEFRAME}")
 # ==================================
 # LOAD DATA
 # ==================================
+df = pd.read_csv(
+    f"../data/{PAIR}_{TIMEFRAME}.csv"
+)
 
-df = pd.read_csv("../data/EURUSD_M15.csv")
+df["time"] = pd.to_datetime(df["time"])
 
 # ==================================
 # SETTINGS

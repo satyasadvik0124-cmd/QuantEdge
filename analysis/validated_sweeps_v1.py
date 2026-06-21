@@ -1,4 +1,5 @@
 import pandas as pd
+import os
 
 # ==================================
 # CONFIG
@@ -10,17 +11,75 @@ LOOKAHEAD_HOURS = 5
 # LOAD DATA
 # ==================================
 
-sweeps_df = pd.read_csv(
-    "../outputs/liquidity_sweeps_v1.csv"
-)
-choch_df = pd.read_csv(
-    "../outputs/choch_events.csv"
+if not os.path.exists("../outputs/liquidity_sweeps_v1.csv"):
+    print("No liquidity sweeps file found.")
+    exit()
+
+if not os.path.exists("../outputs/choch_events.csv"):
+    print("No CHOCH file found.")
+    exit()
+
+try:
+    sweeps_df = pd.read_csv(
+        "../outputs/liquidity_sweeps_v1.csv"
+    )
+
+except Exception as e:
+    print(f"Could not load sweeps: {e}")
+    exit()
+
+try:
+    choch_df = pd.read_csv(
+        "../outputs/choch_events.csv"
+    )
+
+except pd.errors.EmptyDataError:
+    print("No CHOCH events found.")
+
+    pd.DataFrame(
+        columns=[
+            "sweep_time",
+            "choch_time",
+            "type",
+            "price"
+        ]
+    ).to_csv(
+        "../outputs/validated_sweeps_v1.csv",
+        index=False
+    )
+
+    exit()
+
+# ==================================
+# EMPTY CHECKS
+# ==================================
+
+if sweeps_df.empty:
+    print("No sweeps found.")
+    exit()
+
+if choch_df.empty:
+    print("No CHOCH events found.")
+    exit()
+
+# ==================================
+# DATETIME CONVERSION
+# ==================================
+
+sweeps_df["time"] = pd.to_datetime(
+    sweeps_df["time"]
 )
 
-sweeps_df["time"] = pd.to_datetime(sweeps_df["time"])
-choch_df["time"] = pd.to_datetime(choch_df["time"])
+choch_df["time"] = pd.to_datetime(
+    choch_df["time"]
+)
 
 validated_sweeps = []
+
+print("\n===== VALIDATED SWEEPS V1 =====\n")
+
+print("Sweep Types:")
+print(sweeps_df["type"].value_counts())
 
 # ==================================
 # VALIDATION
@@ -31,16 +90,19 @@ for _, sweep in sweeps_df.iterrows():
     sweep_time = sweep["time"]
     sweep_type = sweep["type"]
 
-    window_end = sweep_time + pd.Timedelta(hours=LOOKAHEAD_HOURS)
+    window_end = (
+        sweep_time +
+        pd.Timedelta(hours=LOOKAHEAD_HOURS)
+    )
 
     future_choch = choch_df[
         (choch_df["time"] > sweep_time) &
         (choch_df["time"] <= window_end)
     ]
 
-    # ----------------------------------
-    # BSL Sweep -> Bearish CHOCH
-    # ----------------------------------
+    # ==================================
+    # BSL SWEEP → BEARISH CHOCH
+    # ==================================
 
     if sweep_type == "BSL_SWEEP":
 
@@ -65,9 +127,9 @@ for _, sweep in sweeps_df.iterrows():
                 f"CHOCH: {first_choch['time']}"
             )
 
-    # ----------------------------------
-    # SSL Sweep -> Bullish CHOCH
-    # ----------------------------------
+    # ==================================
+    # SSL SWEEP → BULLISH CHOCH
+    # ==================================
 
     elif sweep_type == "SSL_SWEEP":
 
@@ -96,9 +158,10 @@ for _, sweep in sweeps_df.iterrows():
 # SAVE RESULTS
 # ==================================
 
-validated_df = pd.DataFrame(validated_sweeps)
+validated_df = pd.DataFrame(
+    validated_sweeps
+)
 
-# Remove duplicate validated sweeps
 if not validated_df.empty:
 
     validated_df = validated_df.drop_duplicates(
@@ -109,9 +172,16 @@ validated_df.to_csv(
     "../outputs/validated_sweeps_v1.csv",
     index=False
 )
+
 # ==================================
 # SUMMARY
 # ==================================
 
-print("\nTotal Validated Sweeps:", len(validated_df))
-print("Saved: ../outputs/validated_sweeps_v1.csv")
+print(
+    "\nTotal Validated Sweeps:",
+    len(validated_df)
+)
+
+print(
+    "Saved: ../outputs/validated_sweeps_v1.csv"
+)

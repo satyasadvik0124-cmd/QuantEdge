@@ -1,16 +1,32 @@
 import pandas as pd
+import sys
+import os
 
+sys.path.append(
+    os.path.dirname(
+        os.path.dirname(__file__)
+    )
+)
+
+from config import PAIR, TIMEFRAME
+
+print(f"\nUsing: {PAIR}_{TIMEFRAME}")
 # ----------------------------------
 # LOAD DATA
 # ----------------------------------
 
-df = pd.read_csv("../data/EURUSD_M15.csv")
+df = pd.read_csv(
+    f"../data/{PAIR}_{TIMEFRAME}.csv"
+)
 
 # ----------------------------------
 # SETTINGS
 # ----------------------------------
 
-MIN_DISTANCE = 0.0010      # 10 pips
+if PAIR == "XAUUSD":
+    MIN_DISTANCE = 5.0
+else:
+    MIN_DISTANCE = 0.0010     # 10 pips
 
 # ----------------------------------
 # SWING DETECTOR V3
