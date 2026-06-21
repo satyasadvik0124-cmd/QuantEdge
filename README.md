@@ -1,258 +1,78 @@
 # QuantEdge
 
-## Smart Money Concepts Trading Analytics Engine
+## Institutional Market Structure & Smart Money Concepts Research Engine
 
-QuantEdge is a Python-based quantitative trading research project that automates Smart Money Concepts (SMC) analysis using market structure and liquidity-based models.
+QuantEdge is a Python-based quantitative trading research platform designed to model institutional market behavior using Smart Money Concepts (SMC) and market structure analysis.
 
-The system processes OHLC market data and identifies institutional trading concepts such as:
+The system transforms raw OHLC market data into actionable trading signals through a multi-stage pipeline that identifies liquidity events, market structure shifts, order blocks, fair value gaps, and trade opportunities.
 
-- Swing Highs & Swing Lows
-- Market Structure (HH, HL, LH, LL)
-- Break of Structure (BOS)
-- Change of Character (CHOCH)
-- Liquidity Zones
-- Liquidity Sweeps
-- Order Blocks
-- Fair Value Gaps (FVG)
-- Trade Signals
-- Strategy Backtesting
+### Core Capabilities
 
----
+* Swing High / Swing Low Detection
+* Market Structure Classification (HH, HL, LH, LL)
+* Break of Structure (BOS) Detection
+* Change of Character (CHOCH) Detection
+* Equal High / Equal Low Liquidity Analysis
+* Liquidity Sweep Detection
+* Order Block Identification
+* Fair Value Gap (FVG) Detection
+* Multi-Condition Signal Generation
+* Historical Strategy Backtesting
+* Performance Analytics
 
-## Architecture
+### Quantitative Research Pipeline
 
-```text
 Raw Market Data
-       │
-       ▼
+
+↓
+
 Swing Detection
-       │
-       ▼
-Market Structure
-(HH / HL / LH / LL)
-       │
-       ▼
-BOS Detection
-       │
-       ▼
-CHOCH Detection
-       │
-       ▼
-Liquidity Detection
-       │
-       ▼
-Liquidity Sweeps
-       │
-       ▼
-Order Blocks
-       │
-       ▼
-Fair Value Gaps
-       │
-       ▼
+
+↓
+
+Market Structure Classification
+
+↓
+
+BOS & CHOCH Detection
+
+↓
+
+Liquidity Pool Identification
+
+↓
+
+Liquidity Sweep Validation
+
+↓
+
+Order Block Detection
+
+↓
+
+Fair Value Gap Analysis
+
+↓
+
 Signal Generation
-       │
-       ▼
-Backtesting Engine
-```
 
----
+↓
 
-## Features
+Historical Backtesting
 
-### Market Structure Analysis
+↓
 
-Automatically labels:
+Performance Evaluation
 
-- Higher High (HH)
-- Higher Low (HL)
-- Lower High (LH)
-- Lower Low (LL)
+### Key Achievements
 
----
+* Developed a complete market structure engine capable of automatically classifying institutional price action.
+* Built liquidity-based trading models using sweep and CHOCH confirmation logic.
+* Implemented order block and fair value gap detection algorithms for trade setup generation.
+* Designed a backtesting framework to evaluate strategy performance across multiple assets including EURUSD, GBPUSD, and XAUUSD.
+* Created a modular research architecture that supports future enhancements such as multi-timeframe analysis, premium/discount zones, mitigation blocks, and portfolio-level analytics.
 
-### BOS Detection
-
-Detects:
-
-- Bullish BOS
-- Bearish BOS
-
-Used to identify trend continuation.
-
----
-
-### CHOCH Detection
-
-Detects:
-
-- Bullish CHOCH
-- Bearish CHOCH
-
-Used to identify potential trend reversals.
-
----
-
-### Liquidity Analysis
-
-Detects:
-
-- Equal Highs (EQH)
-- Equal Lows (EQL)
-
-Represents institutional liquidity pools.
-
----
-
-### Liquidity Sweeps
-
-Identifies:
-
-- Buy-Side Liquidity Sweeps
-- Sell-Side Liquidity Sweeps
-
-Detects stop-hunt behavior and liquidity grabs.
-
----
-
-### Order Blocks
-
-Identifies:
-
-- Bullish Order Blocks
-- Bearish Order Blocks
-
-Represents institutional accumulation and distribution zones.
-
----
-
-### Fair Value Gaps
-
-Detects market imbalances using three-candle inefficiency logic.
-
-Types:
-
-- Bullish FVG
-- Bearish FVG
-
----
-
-### Signal Generation
-
-Trade setups generated from confluence of:
-
-- Structure
-- Liquidity Sweep
-- Order Block
-- Fair Value Gap
-
----
-
-### Backtesting Engine
-
-Evaluates:
-
-- Entry
-- Stop Loss
-- Take Profit
-- Risk-Reward Ratio
-- Win/Loss Results
-
----
-
-## Tech Stack
-
-- Python
-- Pandas
-- NumPy
-- MetaTrader 5
-- CSV-Based Data Pipeline
-
----
-
-## Project Structure
-
-```text
-QuantEdge/
-│
-├── analysis/
-│
-├── data/
-│
-├── outputs/
-│
-├── docs/
-│   └── project_progress.md
-│
-├── README.md
-└── requirements.txt
-```
-
----
-
-## Example Workflow
-
-```text
-EURUSD_M15.csv
-      ↓
-Swings
-      ↓
-Market Structure
-      ↓
-BOS
-      ↓
-CHOCH
-      ↓
-Liquidity
-      ↓
-Sweeps
-      ↓
-Order Blocks
-      ↓
-FVG
-      ↓
-Signals
-      ↓
-Backtesting
-```
-
----
-
-## Current Status
-
-### Completed Modules
-
-- Data Collection
-- Swing Detection
-- Market Structure
-- BOS Detection
-- CHOCH Detection
-- Liquidity Detection
-- Liquidity Sweeps
-- Order Blocks
-- Fair Value Gaps
-- Signal Generation
-- Backtesting
-
-Project Status:
-
-**Active Development**
-
----
-
-## Future Enhancements
-
-- Multi-Timeframe Analysis
-- Premium/Discount Zones
-- Mitigation Block Detection
-- Confluence Scoring Engine
-- Strategy Optimization
-- Walk-Forward Testing
-- Interactive Dashboard
-- Portfolio-Level Backtesting
-
----
 
 ## Resume Description
 
-Built QuantEdge, a Python-based Smart Money Concepts trading analytics engine that automatically detects market structure (HH/HL/LH/LL), BOS, CHOCH, liquidity zones, sweeps, order blocks, and fair value gaps. Developed a signal generation and backtesting framework to evaluate strategy performance on historical market data using institutional trading concepts.
+Developed QuantEdge, a Python-based quantitative trading research engine that automates Smart Money Concepts (SMC) analysis using market structure, liquidity sweeps, order blocks, and fair value gaps. Built an end-to-end pipeline for signal generation and historical backtesting, implementing custom algorithms for swing detection, BOS, CHOCH, liquidity analysis, and institutional trade setup identification across Forex and Gold markets.
