@@ -12,6 +12,10 @@ from config import PAIR, TIMEFRAME
 
 print(f"\nUsing: {PAIR}_{TIMEFRAME}")
 
+# ==========================
+# LOAD DATA
+# ==========================
+
 df = pd.read_csv(
     f"../data/{PAIR}_{TIMEFRAME}.csv"
 )
@@ -19,6 +23,10 @@ df = pd.read_csv(
 structure = pd.read_csv(
     "../outputs/market_structure_v4.csv"
 )
+
+# Fast arrays
+close_prices = df["close"].values
+times = df["time"].values
 
 print("\n===== CHOCH V3 =====\n")
 
@@ -28,6 +36,9 @@ protected_HL = None
 protected_LH = None
 
 choch_count = 0
+bullish_choch_count = 0
+bearish_choch_count = 0
+
 choch_events = []
 
 # ==========================
@@ -46,9 +57,20 @@ for i in range(len(structure)):
         trend = "bearish"
         break
 
+print(f"Initial Trend: {trend}")
+
 # ==========================
 # MAIN LOOP
 # ==========================
+# ==========================
+
+# MAIN LOOP (FIXED)
+
+# ==========================
+# MAIN LOOP
+# ==========================
+
+LOOKAHEAD = 500
 
 for i in range(len(structure)):
 
@@ -57,36 +79,41 @@ for i in range(len(structure)):
     label = row["label"]
     idx = int(row["index"])
 
-    # =====================================
-    # BULLISH TREND → LOOK FOR BEARISH CHOCH
-    # =====================================
+    # --------------------------
+    # Store protected levels
+    # --------------------------
+
+    if label == "HL":
+        protected_HL = row
+
+    elif label == "LH":
+        protected_LH = row
+
+    # --------------------------
+    # Bullish -> Bearish CHOCH
+    # --------------------------
 
     if trend == "bullish":
-
-        if label == "HL":
-            protected_HL = row
 
         if protected_HL is not None:
 
             level = protected_HL["price"]
 
-            for j in range(idx + 1, len(df)):
+            for j in range(
+                idx + 1,
+                min(idx + LOOKAHEAD, len(close_prices))
+            ):
 
-                if df.iloc[j]["close"] < level:
-
-                    print(
-                        f"BEARISH CHOCH | "
-                        f"{df.iloc[j]['time']} | "
-                        f"Below HL {round(level, 5)}"
-                    )
+                if close_prices[j] < level:
 
                     choch_events.append({
-                        "time": df.iloc[j]["time"],
+                        "time": times[j],
                         "type": "BEARISH_CHOCH",
                         "price": level
                     })
 
                     choch_count += 1
+                    bearish_choch_count += 1
 
                     trend = "bearish"
 
@@ -95,36 +122,31 @@ for i in range(len(structure)):
 
                     break
 
-    # =====================================
-    # BEARISH TREND → LOOK FOR BULLISH CHOCH
-    # =====================================
+    # --------------------------
+    # Bearish -> Bullish CHOCH
+    # --------------------------
 
     elif trend == "bearish":
-
-        if label == "LH":
-            protected_LH = row
 
         if protected_LH is not None:
 
             level = protected_LH["price"]
 
-            for j in range(idx + 1, len(df)):
+            for j in range(
+                idx + 1,
+                min(idx + LOOKAHEAD, len(close_prices))
+            ):
 
-                if df.iloc[j]["close"] > level:
-
-                    print(
-                        f"BULLISH CHOCH | "
-                        f"{df.iloc[j]['time']} | "
-                        f"Above LH {round(level, 5)}"
-                    )
+                if close_prices[j] > level:
 
                     choch_events.append({
-                        "time": df.iloc[j]["time"],
+                        "time": times[j],
                         "type": "BULLISH_CHOCH",
                         "price": level
                     })
 
                     choch_count += 1
+                    bullish_choch_count += 1
 
                     trend = "bullish"
 
@@ -132,9 +154,36 @@ for i in range(len(structure)):
                     protected_LH = None
 
                     break
+# --------------------------
+# Bearish -> Bullish CHOCH
+# --------------------------
+
+    elif trend == "bearish":
+
+       if protected_LH is not None:
+
+        level = protected_LH["price"]
+
+        if close_prices[idx] > level:
+
+            choch_events.append({
+                "time": times[idx],
+                "type": "BULLISH_CHOCH",
+                "price": level
+            })
+
+            choch_count += 1
+            bullish_choch_count += 1
+
+            trend = "bullish"
+
+            protected_HL = None
+            protected_LH = None
+
+
 
 # ==========================
-# SAVE CHOCH EVENTS
+# SAVE EVENTS
 # ==========================
 
 choch_df = pd.DataFrame(
@@ -152,11 +201,37 @@ choch_df.to_csv(
 )
 
 # ==========================
-# SUMMARY
+# REPORT
 # ==========================
 
-print("\nStructure Points :", len(structure))
-print("Total CHOCH :", choch_count)
+print("\n===== CHOCH REPORT =====\n")
+
+print(
+    f"Structure Points : "
+    f"{len(structure):,}"
+)
+
+print(
+    f"Bullish CHOCH    : "
+    f"{bullish_choch_count:,}"
+)
+
+print(
+    f"Bearish CHOCH    : "
+    f"{bearish_choch_count:,}"
+)
+
+print(
+    f"Total CHOCH      : "
+    f"{choch_count:,}"
+)
+
+if len(structure) > 0:
+
+    print(
+        f"CHOCH Ratio      : "
+        f"{(choch_count / len(structure)) * 100:.2f}%"
+    )
 
 print("\nSaved:")
 print("../outputs/choch_events.csv")

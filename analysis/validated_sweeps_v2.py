@@ -1,26 +1,54 @@
 import pandas as pd
+import os
 
-# ==========================
-# LOAD DATA
-# ==========================
-
-sweeps = pd.read_csv("../outputs/liquidity_sweeps_v1.csv")
-choch = pd.read_csv("../outputs/choch_events.csv")
-
-sweeps["time"] = pd.to_datetime(sweeps["time"])
-choch["time"] = pd.to_datetime(choch["time"])
-
-# ==========================
-# SETTINGS
-# ==========================
+# ==================================
+# CONFIG
+# ==================================
 
 LOOKAHEAD_MINUTES = 150  # 10 M15 candles
 
+# ==================================
+# LOAD DATA
+# ==================================
+
+sweeps_file = "../outputs/liquidity_sweeps_v2.csv"
+choch_file = "../outputs/choch_events.csv"
+
+if not os.path.exists(sweeps_file):
+    print(f"Missing: {sweeps_file}")
+    exit()
+
+if not os.path.exists(choch_file):
+    print(f"Missing: {choch_file}")
+    exit()
+
+sweeps = pd.read_csv(sweeps_file)
+choch = pd.read_csv(choch_file)
+
+if sweeps.empty:
+    print("No liquidity sweeps found.")
+    exit()
+
+if choch.empty:
+    print("No CHOCH events found.")
+    exit()
+
+sweeps["time"] = pd.to_datetime(
+    sweeps["time"]
+)
+
+choch["time"] = pd.to_datetime(
+    choch["time"]
+)
+
+# ==================================
+# VALIDATION LOGIC
+# ==================================
+
 validated = []
 
-# ==========================
-# VALIDATION LOGIC
-# ==========================
+bullish_validated = 0
+bearish_validated = 0
 
 for _, sweep in sweeps.iterrows():
 
@@ -28,10 +56,10 @@ for _, sweep in sweeps.iterrows():
     sweep_type = sweep["type"]
 
     if sweep_type == "BSL_SWEEP":
-        target_choch = "BULLISH_CHOCH"
+        target_choch = "BEARISH_CHOCH"
 
     elif sweep_type == "SSL_SWEEP":
-        target_choch = "BEARISH_CHOCH"
+        target_choch = "BULLISH_CHOCH"
 
     else:
         continue
@@ -43,7 +71,10 @@ for _, sweep in sweeps.iterrows():
         &
         (
             choch["time"]
-            <= sweep_time + pd.Timedelta(minutes=LOOKAHEAD_MINUTES)
+            <= sweep_time
+            + pd.Timedelta(
+                minutes=LOOKAHEAD_MINUTES
+            )
         )
     ]
 
@@ -58,22 +89,71 @@ for _, sweep in sweeps.iterrows():
             "price": sweep["price"]
         })
 
-# ==========================
-# SAVE
-# ==========================
+        if sweep_type == "BSL_SWEEP":
+            bearish_validated += 1
 
-validated_df = pd.DataFrame(validated)
+        elif sweep_type == "SSL_SWEEP":
+            bullish_validated += 1
+
+# ==================================
+# SAVE
+# ==================================
+
+validated_df = pd.DataFrame(
+    validated
+)
+
+if not validated_df.empty:
+
+    validated_df = (
+        validated_df
+        .drop_duplicates(
+            subset=[
+                "sweep_time",
+                "type"
+            ]
+        )
+    )
 
 validated_df.to_csv(
     "../outputs/validated_sweeps_v2.csv",
     index=False
 )
 
-print("\n===== VALIDATED SWEEPS V2 =====")
-print("Total:", len(validated_df))
+# ==================================
+# REPORT
+# ==================================
 
-print(validated_df.head())
+print("\n===== VALIDATED SWEEPS V2 =====\n")
 
 print(
-    "\nSaved to outputs/validated_sweeps_v2.csv"
+    f"Bullish Validated Sweeps : "
+    f"{bullish_validated:,}"
+)
+
+print(
+    f"Bearish Validated Sweeps : "
+    f"{bearish_validated:,}"
+)
+
+print(
+    f"Total Validated Sweeps   : "
+    f"{len(validated_df):,}"
+)
+
+print()
+
+if len(sweeps) > 0:
+
+    print(
+        f"Validation Rate          : "
+        f"{(len(validated_df) / len(sweeps)) * 100:.2f}%"
+    )
+
+print(
+    "\nSaved:"
+)
+
+print(
+    "../outputs/validated_sweeps_v2.csv"
 )

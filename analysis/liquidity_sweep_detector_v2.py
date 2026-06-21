@@ -1,128 +1,149 @@
 import pandas as pd
+import sys
 import os
 
-# ==================================
-# CONFIG
-# ==================================
+sys.path.append(
+    os.path.dirname(
+        os.path.dirname(__file__)
+    )
+)
 
-LOOKAHEAD_HOURS = 24
+from config import PAIR, TIMEFRAME
+
+print(f"\nUsing: {PAIR}_{TIMEFRAME}")
 
 # ==================================
 # LOAD DATA
 # ==================================
 
-sweeps_file = "../outputs/liquidity_sweeps_v1.csv"
-choch_file = "../outputs/choch_events.csv"
+price_df = pd.read_csv(
+    f"../data/{PAIR}_{TIMEFRAME}.csv"
+)
 
-if not os.path.exists(sweeps_file):
-    print(f"Missing: {sweeps_file}")
-    exit()
+liquidity_df = pd.read_csv(
+    "../outputs/liquidity_v2.csv"
+)
 
-if not os.path.exists(choch_file):
-    print(f"Missing: {choch_file}")
-    exit()
+price_df["time"] = pd.to_datetime(
+    price_df["time"]
+)
 
-sweeps_df = pd.read_csv(sweeps_file)
-choch_df = pd.read_csv(choch_file)
-
-if sweeps_df.empty:
-    print("No liquidity sweeps found.")
-    exit()
-
-if choch_df.empty:
-    print("No CHOCH events found.")
-    exit()
-
-sweeps_df["time"] = pd.to_datetime(sweeps_df["time"])
-choch_df["time"] = pd.to_datetime(choch_df["time"])
-
-validated_sweeps = []
+liquidity_df["time"] = pd.to_datetime(
+    liquidity_df["time"]
+)
 
 # ==================================
-# VALIDATION LOGIC
+# SWEEP DETECTION
 # ==================================
 
-for _, sweep in sweeps_df.iterrows():
+sweeps = []
 
-    sweep_time = sweep["time"]
-    sweep_type = sweep["type"]
+bullish_sweeps = 0
+bearish_sweeps = 0
 
-    window_end = sweep_time + pd.Timedelta(
-        hours=LOOKAHEAD_HOURS
-    )
+for _, level in liquidity_df.iterrows():
 
-    future_choch = choch_df[
-        (choch_df["time"] > sweep_time)
-        &
-        (choch_df["time"] <= window_end)
+    liquidity_time = level["time"]
+    liquidity_price = level["price"]
+    liquidity_type = level["type"]
+
+    future_candles = price_df[
+        price_df["time"] > liquidity_time
     ]
 
-    # ----------------------------------
-    # BSL Sweep -> Bearish CHOCH
-    # ----------------------------------
+    # ==========================
+    # EQH -> BSL Sweep
+    # ==========================
 
-    if sweep_type == "BSL_SWEEP":
+    if liquidity_type == "EQH":
 
-        bearish_choch = future_choch[
-            future_choch["type"]
-            == "BEARISH_CHOCH"
-        ]
+        for _, candle in future_candles.iterrows():
 
-        if not bearish_choch.empty:
+            if (
+                candle["high"] > liquidity_price
+                and candle["close"] < liquidity_price
+            ):
 
-            choch = bearish_choch.iloc[0]
+                sweeps.append({
+                    "time": candle["time"],
+                    "type": "BSL_SWEEP",
+                    "price": liquidity_price
+                })
 
-            validated_sweeps.append({
-                "sweep_time": sweep_time,
-                "choch_time": choch["time"],
-                "type": "VALID_BEARISH_SWEEP",
-                "price": sweep["price"]
-            })
+                bearish_sweeps += 1
+                break
 
-    # ----------------------------------
-    # SSL Sweep -> Bullish CHOCH
-    # ----------------------------------
+    # ==========================
+    # EQL -> SSL Sweep
+    # ==========================
 
-    elif sweep_type == "SSL_SWEEP":
+    elif liquidity_type == "EQL":
 
-        bullish_choch = future_choch[
-            future_choch["type"]
-            == "BULLISH_CHOCH"
-        ]
+        for _, candle in future_candles.iterrows():
 
-        if not bullish_choch.empty:
+            if (
+                candle["low"] < liquidity_price
+                and candle["close"] > liquidity_price
+            ):
 
-            choch = bullish_choch.iloc[0]
+                sweeps.append({
+                    "time": candle["time"],
+                    "type": "SSL_SWEEP",
+                    "price": liquidity_price
+                })
 
-            validated_sweeps.append({
-                "sweep_time": sweep_time,
-                "choch_time": choch["time"],
-                "type": "VALID_BULLISH_SWEEP",
-                "price": sweep["price"]
-            })
+                bullish_sweeps += 1
+                break
 
 # ==================================
 # SAVE
 # ==================================
 
-validated_df = pd.DataFrame(
-    validated_sweeps
+sweeps_df = pd.DataFrame(
+    sweeps
 )
 
-if not validated_df.empty:
+if not sweeps_df.empty:
 
-    validated_df = validated_df.drop_duplicates(
-        subset=["sweep_time", "type"]
-    )
+    sweeps_df = sweeps_df.drop_duplicates()
 
-validated_df.to_csv(
-    "../outputs/validated_sweeps_v1.csv",
+sweeps_df.to_csv(
+    "../outputs/liquidity_sweeps_v2.csv",
     index=False
 )
 
 # ==================================
-# SUMMARY
+# REPORT
 # ==================================
 
-print("\nTotal Validated Sweeps:", len(validated_df))
-print("Saved: ../outputs/validated_sweeps_v1.csv")
+print("\n===== SWEEP REPORT =====\n")
+
+print(
+    f"Bullish Sweeps : "
+    f"{bullish_sweeps:,}"
+)
+
+print(
+    f"Bearish Sweeps : "
+    f"{bearish_sweeps:,}"
+)
+
+print(
+    f"Total Sweeps   : "
+    f"{len(sweeps_df):,}"
+)
+
+if len(liquidity_df) > 0:
+
+    print(
+        f"Sweep Rate     : "
+        f"{(len(sweeps_df)/len(liquidity_df))*100:.2f}%"
+    )
+
+print(
+    "\nSaved:"
+)
+
+print(
+    "../outputs/liquidity_sweeps_v2.csv"
+)

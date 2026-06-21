@@ -5,7 +5,7 @@ import pandas as pd
 # ==================================
 
 sweeps = pd.read_csv(
-    "../outputs/validated_sweeps_v1.csv"
+    "../outputs/validated_sweeps_v2.csv"
 )
 
 obs = pd.read_csv(
@@ -30,13 +30,7 @@ fvgs["time"] = pd.to_datetime(
 
 signals = []
 
-print("\n===== SIGNALS V3 =====")
-
-print("\nOrder Blocks:")
-print(obs)
-
-print("\nFVG Counts:")
-print(fvgs["type"].value_counts())
+print("\n===== SIGNAL GENERATOR V3 =====\n")
 
 # ==================================
 # GENERATE SIGNALS
@@ -48,13 +42,10 @@ for _, sweep in sweeps.iterrows():
     choch_time = sweep["choch_time"]
 
     # ==================================
-    # VALID BULLISH SWEEP
+    # SSL_SWEEP -> BUY SIGNAL
     # ==================================
 
-    if sweep_type == "VALID_BULLISH_SWEEP":
-
-        print("\n====================")
-        print("CHOCH:", choch_time)
+    if sweep_type == "SSL_SWEEP":
 
         matching_obs = obs[
             (obs["type"] == "BULLISH_OB")
@@ -62,21 +53,26 @@ for _, sweep in sweeps.iterrows():
             (obs["time"] <= choch_time)
         ]
 
-        print(
-            "Matching OBs:",
-            len(matching_obs)
+        if matching_obs.empty:
+            continue
+
+        matching_obs = matching_obs.copy()
+
+        matching_obs["distance"] = (
+            choch_time - matching_obs["time"]
         )
+
+        matching_obs = matching_obs[
+            matching_obs["distance"]
+            <= pd.Timedelta(days=7)
+        ]
 
         if matching_obs.empty:
             continue
 
-        # Latest OB before CHOCH
         ob = matching_obs.sort_values(
-            by="time"
-        ).iloc[-1]
-
-        print("OB Time:", ob["time"])
-        print("OB Type:", ob["type"])
+            by="distance"
+        ).iloc[0]
 
         matching_fvgs = fvgs[
             (fvgs["type"] == "BULLISH_FVG")
@@ -85,14 +81,9 @@ for _, sweep in sweeps.iterrows():
             &
             (
                 fvgs["time"]
-                <= ob["time"] + pd.Timedelta(hours=24)
+                <= ob["time"] + pd.Timedelta(days=7)
             )
         ]
-
-        print(
-            "Bullish FVGs Found:",
-            len(matching_fvgs)
-        )
 
         if matching_fvgs.empty:
             continue
@@ -101,6 +92,9 @@ for _, sweep in sweeps.iterrows():
         sl = ob["low"]
 
         risk = entry - sl
+
+        if risk <= 0:
+            continue
 
         tp = entry + (risk * 3)
 
@@ -116,13 +110,10 @@ for _, sweep in sweeps.iterrows():
         })
 
     # ==================================
-    # VALID BEARISH SWEEP
+    # BSL_SWEEP -> SELL SIGNAL
     # ==================================
 
-    elif sweep_type == "VALID_BEARISH_SWEEP":
-
-        print("\n====================")
-        print("CHOCH:", choch_time)
+    elif sweep_type == "BSL_SWEEP":
 
         matching_obs = obs[
             (obs["type"] == "BEARISH_OB")
@@ -130,21 +121,26 @@ for _, sweep in sweeps.iterrows():
             (obs["time"] <= choch_time)
         ]
 
-        print(
-            "Matching OBs:",
-            len(matching_obs)
+        if matching_obs.empty:
+            continue
+
+        matching_obs = matching_obs.copy()
+
+        matching_obs["distance"] = (
+            choch_time - matching_obs["time"]
         )
+
+        matching_obs = matching_obs[
+            matching_obs["distance"]
+            <= pd.Timedelta(days=7)
+        ]
 
         if matching_obs.empty:
             continue
 
-        # Latest OB before CHOCH
         ob = matching_obs.sort_values(
-            by="time"
-        ).iloc[-1]
-
-        print("OB Time:", ob["time"])
-        print("OB Type:", ob["type"])
+            by="distance"
+        ).iloc[0]
 
         matching_fvgs = fvgs[
             (fvgs["type"] == "BEARISH_FVG")
@@ -153,14 +149,9 @@ for _, sweep in sweeps.iterrows():
             &
             (
                 fvgs["time"]
-                <= ob["time"] + pd.Timedelta(hours=24)
+                <= ob["time"] + pd.Timedelta(days=7)
             )
         ]
-
-        print(
-            "Bearish FVGs Found:",
-            len(matching_fvgs)
-        )
 
         if matching_fvgs.empty:
             continue
@@ -169,6 +160,9 @@ for _, sweep in sweeps.iterrows():
         sl = ob["high"]
 
         risk = sl - entry
+
+        if risk <= 0:
+            continue
 
         tp = entry - (risk * 3)
 
@@ -191,11 +185,12 @@ signals_df = pd.DataFrame(signals)
 
 if not signals_df.empty:
 
-    signals_df = signals_df.drop_duplicates()
-
-    signals_df = signals_df.sort_values(
-        by="signal_time"
-    ).reset_index(drop=True)
+    signals_df = (
+        signals_df
+        .drop_duplicates()
+        .sort_values(by="signal_time")
+        .reset_index(drop=True)
+    )
 
 # ==================================
 # SAVE
@@ -207,18 +202,49 @@ signals_df.to_csv(
 )
 
 # ==================================
-# SUMMARY
+# REPORT
 # ==================================
 
-print("\n====================")
-print(
-    "Signals Found:",
-    len(signals_df)
-)
+bullish_signals = 0
+bearish_signals = 0
 
 if not signals_df.empty:
-    print(signals_df)
+
+    bullish_signals = len(
+        signals_df[
+            signals_df["direction"] == "BUY"
+        ]
+    )
+
+    bearish_signals = len(
+        signals_df[
+            signals_df["direction"] == "SELL"
+        ]
+    )
+
+print("\n===== SIGNAL REPORT =====\n")
 
 print(
-    "\nSaved: ../outputs/signals_v3.csv"
+    f"Bullish Signals : "
+    f"{bullish_signals:,}"
 )
+
+print(
+    f"Bearish Signals : "
+    f"{bearish_signals:,}"
+)
+
+print(
+    f"Total Signals   : "
+    f"{len(signals_df):,}"
+)
+
+if len(sweeps) > 0:
+
+    print(
+        f"Signal Rate     : "
+        f"{(len(signals_df) / len(sweeps)) * 100:.2f}%"
+    )
+
+print("\nSaved:")
+print("../outputs/signals_v3.csv")

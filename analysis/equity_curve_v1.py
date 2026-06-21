@@ -5,6 +5,9 @@ RISK_PER_TRADE = 100
 
 df = pd.read_csv("../outputs/backtest_results_v1.csv")
 
+print("Trades Loaded:", len(df))
+print("Net R:", df["rr"].sum())
+
 equity = STARTING_BALANCE
 
 curve = []
@@ -20,10 +23,12 @@ for i, row in df.iterrows():
 
 curve_df = pd.DataFrame(curve)
 
+print("\nLast 5 rows before save:")
+print(curve_df.tail())
+
 curve_df.to_csv(
     "../outputs/equity_curve.csv",
     index=False
 )
 
-print("✅ Equity curve generated")
-print(curve_df.tail())
+print("\nSaved equity curve.")

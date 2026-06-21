@@ -3,10 +3,24 @@ import pandas as pd
 # ----------------------------------
 # LOAD DATA
 # ----------------------------------
+import sys
+import os
 
-df = pd.read_csv("../data/EURUSD_M15.csv")
+sys.path.append(
+    os.path.dirname(
+        os.path.dirname(__file__)
+    )
+)
 
-MIN_DISTANCE = 0.0010
+from config import PAIR, TIMEFRAME
+df = pd.read_csv(
+    f"../data/{PAIR}_{TIMEFRAME}.csv"
+)
+
+if PAIR == "XAUUSD":
+    MIN_DISTANCE = 5.0
+else:
+    MIN_DISTANCE = 0.0010
 
 # ----------------------------------
 # SWING DETECTOR V3
@@ -150,11 +164,12 @@ for swing in filtered:
 
 print("\n===== BOS V4 =====\n")
 
-bos_count = 0
+bos_events = []
 
-for i in range(len(structure)):
+bullish_bos_count = 0
+bearish_bos_count = 0
 
-    swing = structure[i]
+for swing in structure:
 
     # -----------------------
     # Bullish BOS
@@ -171,13 +186,13 @@ for i in range(len(structure)):
 
             if df["close"][j] > level:
 
-                print(
-                    f"BULLISH BOS | "
-                    f"{df['time'][j]} | "
-                    f"{round(level,5)}"
-                )
+                bos_events.append({
+                    "time": df["time"][j],
+                    "type": "Bullish BOS",
+                    "level": level
+                })
 
-                bos_count += 1
+                bullish_bos_count += 1
                 break
 
     # -----------------------
@@ -195,14 +210,48 @@ for i in range(len(structure)):
 
             if df["close"][j] < level:
 
-                print(
-                    f"BEARISH BOS | "
-                    f"{df['time'][j]} | "
-                    f"{round(level,5)}"
-                )
+                bos_events.append({
+                    "time": df["time"][j],
+                    "type": "Bearish BOS",
+                    "level": level
+                })
 
-                bos_count += 1
+                bearish_bos_count += 1
                 break
 
-print("\nFiltered Structure:", len(structure))
-print("Total BOS:", bos_count)
+# ----------------------------------
+# SAVE BOS EVENTS
+# ----------------------------------
+
+bos_df = pd.DataFrame(bos_events)
+
+bos_df.to_csv(
+    "../outputs/bos_events_v4.csv",
+    index=False
+)
+
+# ----------------------------------
+# REPORT
+# ----------------------------------
+
+print("\n===== BOS REPORT =====\n")
+
+print(f"Filtered Structure : {len(structure):,}")
+
+print(f"Bullish BOS        : {bullish_bos_count:,}")
+print(f"Bearish BOS        : {bearish_bos_count:,}")
+
+print(
+    f"Total BOS          : "
+    f"{bullish_bos_count + bearish_bos_count:,}"
+)
+
+print(
+    f"BOS Ratio          : "
+    f"{((bullish_bos_count + bearish_bos_count) / len(structure)) * 100:.2f}%"
+)
+
+print(
+    "\nSaved: "
+    "../outputs/bos_events_v4.csv"
+)

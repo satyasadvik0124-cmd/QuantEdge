@@ -2,7 +2,7 @@ import pandas as pd
 import os
 
 # ==========================
-# LOAD FILE
+# LOAD BACKTEST RESULTS
 # ==========================
 
 FILE_PATH = "../outputs/backtest_results_v1.csv"
@@ -12,6 +12,18 @@ if not os.path.exists(FILE_PATH):
     exit()
 
 df = pd.read_csv(FILE_PATH)
+
+# ==========================
+# LOAD EQUITY CURVE
+# ==========================
+
+EQUITY_FILE = "../outputs/equity_curve.csv"
+
+if not os.path.exists(EQUITY_FILE):
+    print(f"File not found: {EQUITY_FILE}")
+    exit()
+
+equity_df = pd.read_csv(EQUITY_FILE)
 
 # ==========================
 # DEBUG INFO
@@ -110,10 +122,14 @@ win_rate = (
 
 avg_rr = df[rr_col].mean()
 
-gross_profit = df[df[rr_col] > 0][rr_col].sum()
+gross_profit = (
+    df[df[rr_col] > 0][rr_col]
+    .sum()
+)
 
 gross_loss = abs(
-    df[df[rr_col] < 0][rr_col].sum()
+    df[df[rr_col] < 0][rr_col]
+    .sum()
 )
 
 profit_factor = (
@@ -138,7 +154,11 @@ for result in df[result_col]:
 
     result = str(result).upper()
 
-    if result in ["WIN", "TP", "PROFIT"]:
+    if result in [
+        "WIN",
+        "TP",
+        "PROFIT"
+    ]:
 
         current_win += 1
         current_loss = 0
@@ -148,7 +168,11 @@ for result in df[result_col]:
             current_win
         )
 
-    elif result in ["LOSS", "SL", "LOSE"]:
+    elif result in [
+        "LOSS",
+        "SL",
+        "LOSE"
+    ]:
 
         current_loss += 1
         current_win = 0
@@ -169,6 +193,26 @@ expectancy = (
 )
 
 # ==========================
+# CAPITAL METRICS
+# ==========================
+
+INITIAL_CAPITAL = 10000
+
+final_capital = (
+    equity_df.iloc[-1]["equity"]
+)
+
+net_profit = (
+    final_capital
+    - INITIAL_CAPITAL
+)
+
+return_pct = (
+    net_profit
+    / INITIAL_CAPITAL
+) * 100
+
+# ==========================
 # REPORT
 # ==========================
 
@@ -176,6 +220,14 @@ report = f"""
 =================================
 QUANTEDGE PERFORMANCE REPORT
 =================================
+
+Initial Capital : ${INITIAL_CAPITAL:,.2f}
+Final Capital   : ${final_capital:,.2f}
+
+Net Profit      : ${net_profit:,.2f}
+Return (%)      : {return_pct:.2f}%
+
+---------------------------------
 
 Total Trades : {total_trades}
 

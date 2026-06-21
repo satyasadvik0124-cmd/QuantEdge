@@ -11,6 +11,7 @@ sys.path.append(
 from config import PAIR, TIMEFRAME
 
 print(f"\nUsing: {PAIR}_{TIMEFRAME}")
+
 # ----------------------------------
 # LOAD DATA
 # ----------------------------------
@@ -26,7 +27,7 @@ df = pd.read_csv(
 if PAIR == "XAUUSD":
     MIN_DISTANCE = 5.0
 else:
-    MIN_DISTANCE = 0.0010     # 10 pips
+    MIN_DISTANCE = 0.0010  # 10 pips
 
 # ----------------------------------
 # SWING DETECTOR V3
@@ -38,12 +39,12 @@ for i in range(3, len(df) - 3):
 
     # Swing High
     if (
-        df["high"][i] > df["high"][i-1]
-        and df["high"][i] > df["high"][i-2]
-        and df["high"][i] > df["high"][i-3]
-        and df["high"][i] > df["high"][i+1]
-        and df["high"][i] > df["high"][i+2]
-        and df["high"][i] > df["high"][i+3]
+        df["high"][i] > df["high"][i - 1]
+        and df["high"][i] > df["high"][i - 2]
+        and df["high"][i] > df["high"][i - 3]
+        and df["high"][i] > df["high"][i + 1]
+        and df["high"][i] > df["high"][i + 2]
+        and df["high"][i] > df["high"][i + 3]
     ):
         swings.append({
             "index": i,
@@ -54,12 +55,12 @@ for i in range(3, len(df) - 3):
 
     # Swing Low
     if (
-        df["low"][i] < df["low"][i-1]
-        and df["low"][i] < df["low"][i-2]
-        and df["low"][i] < df["low"][i-3]
-        and df["low"][i] < df["low"][i+1]
-        and df["low"][i] < df["low"][i+2]
-        and df["low"][i] < df["low"][i+3]
+        df["low"][i] < df["low"][i - 1]
+        and df["low"][i] < df["low"][i - 2]
+        and df["low"][i] < df["low"][i - 3]
+        and df["low"][i] < df["low"][i + 1]
+        and df["low"][i] < df["low"][i + 2]
+        and df["low"][i] < df["low"][i + 3]
     ):
         swings.append({
             "index": i,
@@ -117,14 +118,13 @@ for swing in cleaned:
 
     last = filtered[-1]
 
-    distance = abs(swing["price"] - last["price"])
+    distance = abs(
+        swing["price"] - last["price"]
+    )
 
     if distance >= MIN_DISTANCE:
         filtered.append(swing)
 
-# ----------------------------------
-# LABEL STRUCTURE
-# ----------------------------------
 # ----------------------------------
 # LABEL STRUCTURE
 # ----------------------------------
@@ -168,20 +168,83 @@ for swing in filtered:
 
     structure.append(swing)
 
-    print(
-        f"{swing['time']} | "
-        f"{label} | "
-        f"{round(swing['price'],5)}"
-    )
+# ----------------------------------
+# REPORTING
+# ----------------------------------
 
-print("\nOriginal Swings :", len(swings))
-print("Cleaned Swings  :", len(cleaned))
-print("Filtered Swings :", len(filtered))
-structure_df = pd.DataFrame(structure)
+hh_count = sum(
+    1 for s in structure
+    if s["label"] == "HH"
+)
+
+hl_count = sum(
+    1 for s in structure
+    if s["label"] == "HL"
+)
+
+lh_count = sum(
+    1 for s in structure
+    if s["label"] == "LH"
+)
+
+ll_count = sum(
+    1 for s in structure
+    if s["label"] == "LL"
+)
+
+sh_count = sum(
+    1 for s in structure
+    if s["label"] == "SH"
+)
+
+sl_count = sum(
+    1 for s in structure
+    if s["label"] == "SL"
+)
+
+print("\n===== MARKET STRUCTURE REPORT =====\n")
+
+print(f"Original Swings : {len(swings):,}")
+print(f"Cleaned Swings  : {len(cleaned):,}")
+print(f"Filtered Swings : {len(filtered):,}")
+
+print()
+
+print(f"Initial SH      : {sh_count}")
+print(f"Initial SL      : {sl_count}")
+
+print()
+
+print(f"HH Count        : {hh_count:,}")
+print(f"HL Count        : {hl_count:,}")
+print(f"LH Count        : {lh_count:,}")
+print(f"LL Count        : {ll_count:,}")
+
+print()
+
+print(
+    f"Total Structure : "
+    f"{len(structure):,}"
+)
+
+print(
+    f"Reduction Rate  : "
+    f"{((len(swings) - len(filtered)) / len(swings)) * 100:.2f}%"
+)
+
+# ----------------------------------
+# SAVE CSV
+# ----------------------------------
+
+structure_df = pd.DataFrame(
+    structure
+)
 
 structure_df.to_csv(
     "../outputs/market_structure_v4.csv",
     index=False
 )
 
-print("\nSaved ../outputs/market_structure_v4.csv")
+print(
+    "\nSaved ../outputs/market_structure_v4.csv"
+)

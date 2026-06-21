@@ -25,11 +25,12 @@ price_df["time"] = pd.to_datetime(
 )
 
 sweeps_df = pd.read_csv(
-    "../outputs/validated_sweeps_v1.csv"
+    "../outputs/validated_sweeps_v2.csv"
 )
 
-print("\nSweep Types:")
-print(sweeps_df["type"].value_counts())
+if sweeps_df.empty:
+    print("No validated sweeps found.")
+    exit()
 
 sweeps_df["choch_time"] = pd.to_datetime(
     sweeps_df["choch_time"]
@@ -37,7 +38,7 @@ sweeps_df["choch_time"] = pd.to_datetime(
 
 order_blocks = []
 
-print("\n===== ORDER BLOCKS V2 =====\n")
+print("\n===== ORDER BLOCK DETECTOR V1 =====\n")
 
 # ==================================
 # FIND ORDER BLOCKS
@@ -48,8 +49,6 @@ for _, sweep in sweeps_df.iterrows():
     choch_time = sweep["choch_time"]
     sweep_type = sweep["type"]
 
-    # Find CHOCH candle
-
     choch_rows = price_df[
         price_df["time"] == choch_time
     ]
@@ -59,13 +58,20 @@ for _, sweep in sweeps_df.iterrows():
 
     choch_idx = choch_rows.index[0]
 
+    # Debug (first few only)
+    if len(order_blocks) < 5:
+        print(
+            f"CHOCH={choch_time} | "
+            f"TYPE={sweep_type} | "
+            f"IDX={choch_idx}"
+        )
+
     # ==================================
-    # VALID_BULLISH_SWEEP
-    # -> Find last bearish candle
-    # -> BULLISH OB
+    # SSL_SWEEP -> BULLISH OB
+    # Find last bearish candle
     # ==================================
 
-    if sweep_type == "VALID_BULLISH_SWEEP":
+    if sweep_type == "SSL_SWEEP":
 
         for i in range(
             choch_idx - 1,
@@ -84,22 +90,14 @@ for _, sweep in sweeps_df.iterrows():
                     "low": candle["low"]
                 })
 
-                print(
-                    f"BULLISH_OB | "
-                    f"{candle['time']} | "
-                    f"{round(candle['low'], 5)} - "
-                    f"{round(candle['high'], 5)}"
-                )
-
                 break
 
     # ==================================
-    # VALID_BEARISH_SWEEP
-    # -> Find last bullish candle
-    # -> BEARISH OB
+    # BSL_SWEEP -> BEARISH OB
+    # Find last bullish candle
     # ==================================
 
-    elif sweep_type == "VALID_BEARISH_SWEEP":
+    elif sweep_type == "BSL_SWEEP":
 
         for i in range(
             choch_idx - 1,
@@ -118,13 +116,6 @@ for _, sweep in sweeps_df.iterrows():
                     "low": candle["low"]
                 })
 
-                print(
-                    f"BEARISH_OB | "
-                    f"{candle['time']} | "
-                    f"{round(candle['low'], 5)} - "
-                    f"{round(candle['high'], 5)}"
-                )
-
                 break
 
 # ==================================
@@ -137,9 +128,11 @@ if not ob_df.empty:
 
     ob_df = ob_df.drop_duplicates()
 
-    ob_df = ob_df.sort_values(
-        by="time"
-    ).reset_index(drop=True)
+    ob_df = (
+        ob_df
+        .sort_values(by="time")
+        .reset_index(drop=True)
+    )
 
 # ==================================
 # SAVE
@@ -151,24 +144,49 @@ ob_df.to_csv(
 )
 
 # ==================================
-# SUMMARY
+# REPORT
 # ==================================
 
-print("\n===== SUMMARY =====")
-
-print(
-    "Order Blocks Found:",
-    len(ob_df)
-)
+bullish_ob = 0
+bearish_ob = 0
 
 if not ob_df.empty:
 
-    print("\nType Counts:")
-
-    print(
-        ob_df["type"].value_counts()
+    bullish_ob = len(
+        ob_df[
+            ob_df["type"] == "BULLISH_OB"
+        ]
     )
 
+    bearish_ob = len(
+        ob_df[
+            ob_df["type"] == "BEARISH_OB"
+        ]
+    )
+
+print("\n===== ORDER BLOCK REPORT =====\n")
+
 print(
-    "\nSaved: ../outputs/order_blocks_v1.csv"
+    f"Bullish Order Blocks : "
+    f"{bullish_ob:,}"
 )
+
+print(
+    f"Bearish Order Blocks : "
+    f"{bearish_ob:,}"
+)
+
+print(
+    f"Total Order Blocks   : "
+    f"{len(ob_df):,}"
+)
+
+if len(sweeps_df) > 0:
+
+    print(
+        f"OB Conversion Rate   : "
+        f"{(len(ob_df) / len(sweeps_df)) * 100:.2f}%"
+    )
+
+print("\nSaved:")
+print("../outputs/order_blocks_v1.csv")
