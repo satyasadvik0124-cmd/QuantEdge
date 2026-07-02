@@ -311,10 +311,6 @@ The strategy demonstrated positive expectancy and profitability across all teste
 
 ---
 
-# Author
 
-**Satya Sadvik**
 
-B.Tech Information Technology
-
-Quantitative Trading Research | Python Development | Algorithmic Trading
+Quantitative Trading Research | Algorithmic Trading
