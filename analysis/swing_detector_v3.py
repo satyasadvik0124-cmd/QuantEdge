@@ -12,23 +12,28 @@ sys.path.append(
     )
 )
 
-from config import PAIR, TIMEFRAME
+from config import (
+    PAIR,
+    TIMEFRAME_NAME,
+    HISTORICAL_FILE,
+)
 
-print(PAIR)
-print(TIMEFRAME)
+print("Pair      :", PAIR)
+print("Timeframe :", TIMEFRAME_NAME)
+print("File      :", HISTORICAL_FILE)
+
 # ----------------------------------
 # Load Data
 # ----------------------------------
 
-df = pd.read_csv(
-    f"../data/{PAIR}_{TIMEFRAME}.csv"
-)
+df = pd.read_csv(HISTORICAL_FILE)
 
 print("\nDataset Loaded Successfully")
 print("Rows:", len(df))
 print("Columns:", df.columns.tolist())
 print(df.head())
 print(df["close"].head())
+
 # ----------------------------------
 # Swing Detection V3
 # 3 candles left + 3 candles right

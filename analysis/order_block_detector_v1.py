@@ -7,21 +7,18 @@ sys.path.append(
         os.path.dirname(__file__)
     )
 )
-
-from config import PAIR, TIMEFRAME
-
-print(f"\nUsing: {PAIR}_{TIMEFRAME}")
-
-# ==================================
-# LOAD DATA
-# ==================================
-
-price_df = pd.read_csv(
-    f"../data/{PAIR}_{TIMEFRAME}.csv"
+from config import (
+    PAIR,
+    TIMEFRAME_NAME,
+    HISTORICAL_FILE
 )
 
-price_df["time"] = pd.to_datetime(
-    price_df["time"]
+print(f"\nUsing: {PAIR}_{TIMEFRAME_NAME}")
+
+df = pd.read_csv(HISTORICAL_FILE)
+
+df["time"] = pd.to_datetime(
+    df["time"]
 )
 
 sweeps_df = pd.read_csv(
@@ -49,8 +46,8 @@ for _, sweep in sweeps_df.iterrows():
     choch_time = sweep["choch_time"]
     sweep_type = sweep["type"]
 
-    choch_rows = price_df[
-        price_df["time"] == choch_time
+    choch_rows = df[
+        df["time"] == choch_time
     ]
 
     if choch_rows.empty:
@@ -79,7 +76,7 @@ for _, sweep in sweeps_df.iterrows():
             -1
         ):
 
-            candle = price_df.iloc[i]
+            candle = df.iloc[i]
 
             if candle["close"] < candle["open"]:
 
@@ -105,7 +102,7 @@ for _, sweep in sweeps_df.iterrows():
             -1
         ):
 
-            candle = price_df.iloc[i]
+            candle = df.iloc[i]
 
             if candle["close"] > candle["open"]:
 

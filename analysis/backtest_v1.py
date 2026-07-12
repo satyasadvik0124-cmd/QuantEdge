@@ -8,20 +8,18 @@ sys.path.append(
     )
 )
 
-from config import PAIR, TIMEFRAME
-
-print(f"\nUsing: {PAIR}_{TIMEFRAME}")
-
-# ==================================
-# LOAD PRICE DATA
-# ==================================
-
-price_df = pd.read_csv(
-    f"../data/{PAIR}_{TIMEFRAME}.csv"
+from config import (
+    PAIR,
+    TIMEFRAME_NAME,
+    HISTORICAL_FILE
 )
 
-price_df["time"] = pd.to_datetime(
-    price_df["time"]
+print(f"\nUsing: {PAIR}_{TIMEFRAME_NAME}")
+
+df = pd.read_csv(HISTORICAL_FILE)
+
+df["time"] = pd.to_datetime(
+    df["time"]
 )
 
 # ==================================
@@ -73,8 +71,8 @@ for _, signal in signals_df.iterrows():
     sl = signal["sl"]
     tp = signal["tp"]
 
-    signal_rows = price_df[
-        price_df["time"] == signal_time
+    signal_rows = df[
+        df["time"] == signal_time
     ]
 
     if signal_rows.empty:
@@ -90,9 +88,9 @@ for _, signal in signals_df.iterrows():
 
     if direction == "BUY":
 
-        for i in range(start_idx + 1, len(price_df)):
+        for i in range(start_idx + 1, len(df)):
 
-            candle = price_df.iloc[i]
+            candle = df.iloc[i]
 
             if candle["low"] <= sl:
 
@@ -122,9 +120,9 @@ for _, signal in signals_df.iterrows():
 
     elif direction == "SELL":
 
-        for i in range(start_idx + 1, len(price_df)):
+        for i in range(start_idx + 1, len(df)):
 
-            candle = price_df.iloc[i]
+            candle = df.iloc[i]
 
             if candle["high"] >= sl:
 

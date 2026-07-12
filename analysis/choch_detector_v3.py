@@ -8,17 +8,15 @@ sys.path.append(
     )
 )
 
-from config import PAIR, TIMEFRAME
-
-print(f"\nUsing: {PAIR}_{TIMEFRAME}")
-
-# ==========================
-# LOAD DATA
-# ==========================
-
-df = pd.read_csv(
-    f"../data/{PAIR}_{TIMEFRAME}.csv"
+from config import (
+    PAIR,
+    TIMEFRAME_NAME,
+    HISTORICAL_FILE
 )
+
+print(f"\nUsing: {PAIR}_{TIMEFRAME_NAME}")
+
+df = pd.read_csv(HISTORICAL_FILE)
 
 structure = pd.read_csv(
     "../outputs/market_structure_v4.csv"

@@ -8,24 +8,22 @@ sys.path.append(
     )
 )
 
-from config import PAIR, TIMEFRAME
-
-print(f"\nUsing: {PAIR}_{TIMEFRAME}")
-
-# ==================================
-# LOAD DATA
-# ==================================
-
-price_df = pd.read_csv(
-    f"../data/{PAIR}_{TIMEFRAME}.csv"
+from config import (
+    PAIR,
+    TIMEFRAME_NAME,
+    HISTORICAL_FILE
 )
+
+print(f"\nUsing: {PAIR}_{TIMEFRAME_NAME}")
+
+df = pd.read_csv(HISTORICAL_FILE)
 
 liquidity_df = pd.read_csv(
     "../outputs/liquidity_v2.csv"
 )
 
-price_df["time"] = pd.to_datetime(
-    price_df["time"]
+df["time"] = pd.to_datetime(
+    df["time"]
 )
 
 liquidity_df["time"] = pd.to_datetime(
@@ -47,8 +45,8 @@ for _, level in liquidity_df.iterrows():
     liquidity_price = level["price"]
     liquidity_type = level["type"]
 
-    future_candles = price_df[
-        price_df["time"] > liquidity_time
+    future_candles = df[
+        df["time"] > liquidity_time
     ]
 
     # ==========================
