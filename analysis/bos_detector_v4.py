@@ -1,257 +1,301 @@
+"""
+=========================================================
+QuantEdge V2
+BOS Detector V4
+=========================================================
+
+Detects Break of Structure (BOS)
+
+Input:
+    DataFrame from MarketStructure
+
+Output:
+    Same DataFrame enriched with BOS information
+
+Author : QuantEdge
+"""
+
+from pathlib import Path
+
 import pandas as pd
 
-# ----------------------------------
-# LOAD DATA
-# ----------------------------------
-import sys
-import os
+from config import OUTPUT_FOLDER
 
-sys.path.append(
-    os.path.dirname(
-        os.path.dirname(__file__)
-    )
-)
 
-from config import PAIR, TIMEFRAME
-df = pd.read_csv(
-    f"../data/{PAIR}_{TIMEFRAME}.csv"
-)
+class BOSDetector:
 
-if PAIR == "XAUUSD":
-    MIN_DISTANCE = 5.0
-else:
-    MIN_DISTANCE = 0.0010
+    def __init__(self):
 
-# ----------------------------------
-# SWING DETECTOR V3
-# ----------------------------------
+        self.bullish_bos = 0
+        self.bearish_bos = 0
 
-swings = []
+    # =====================================================
+    # Detect BOS
+    # =====================================================
 
-for i in range(3, len(df) - 3):
+    def run(
+        self,
+        df: pd.DataFrame,
+        save_output=False
+    ) -> pd.DataFrame:
 
-    # Swing High
-    if (
-        df["high"][i] > df["high"][i-1]
-        and df["high"][i] > df["high"][i-2]
-        and df["high"][i] > df["high"][i-3]
-        and df["high"][i] > df["high"][i+1]
-        and df["high"][i] > df["high"][i+2]
-        and df["high"][i] > df["high"][i+3]
+        df = df.copy()
+
+        # -----------------------------------------
+        # Initialize Columns
+        # -----------------------------------------
+
+        df["bos"] = False
+        df["bos_type"] = None
+        df["bos_level"] = None
+
+        # -----------------------------------------
+        # Structure Points
+        # -----------------------------------------
+
+        structure = df[
+            df["structure"].notna()
+        ].copy()
+
+        structure = structure.reset_index()
+
+        structure.rename(
+            columns={
+                "index": "candle_index"
+            },
+            inplace=True
+        )
+
+        bos_events = []
+
+        self.bullish_bos = 0
+        self.bearish_bos = 0
+                # -----------------------------------------
+        # Bullish & Bearish BOS Detection
+        # -----------------------------------------
+
+        for _, swing in structure.iterrows():
+
+            # =====================================
+            # Bullish BOS
+            # =====================================
+
+            if swing["structure"] == "HH":
+
+                level = swing["swing_price"]
+
+                for j in range(
+                    swing["candle_index"] + 1,
+                    len(df)
+                ):
+
+                    if df.loc[j, "close"] > level:
+
+                        df.loc[j, "bos"] = True
+                        df.loc[j, "bos_type"] = "Bullish BOS"
+                        df.loc[j, "bos_level"] = level
+
+                        bos_events.append({
+                            "time": df.loc[j, "time"],
+                            "type": "Bullish BOS",
+                            "level": level
+                        })
+
+                        self.bullish_bos += 1
+
+                        break
+
+            # =====================================
+            # Bearish BOS
+            # =====================================
+
+            elif swing["structure"] == "LL":
+
+                level = swing["swing_price"]
+
+                for j in range(
+                    swing["candle_index"] + 1,
+                    len(df)
+                ):
+
+                    if df.loc[j, "close"] < level:
+
+                        df.loc[j, "bos"] = True
+                        df.loc[j, "bos_type"] = "Bearish BOS"
+                        df.loc[j, "bos_level"] = level
+
+                        bos_events.append({
+                            "time": df.loc[j, "time"],
+                            "type": "Bearish BOS",
+                            "level": level
+                        })
+
+                        self.bearish_bos += 1
+
+                        break
+
+        # -----------------------------------------
+        # Optional CSV Export
+        # -----------------------------------------
+
+        if save_output:
+
+            Path(
+                OUTPUT_FOLDER
+            ).mkdir(
+                exist_ok=True
+            )
+
+            bos_df = pd.DataFrame(
+                bos_events
+            )
+
+            bos_df.to_csv(
+                f"{OUTPUT_FOLDER}/bos_events_v4.csv",
+                index=False
+            )
+
+        return df
+        # =====================================================
+    # Get BOS Events
+    # =====================================================
+
+    def get_bos(
+        self,
+        df: pd.DataFrame
+    ) -> pd.DataFrame:
+
+        bos = df[
+            df["bos"] == True
+        ].copy()
+
+        return bos.reset_index(
+            drop=False
+        )
+
+    # =====================================================
+    # Report
+    # =====================================================
+
+    def report(
+        self,
+        df: pd.DataFrame
     ):
-        swings.append({
-            "index": i,
-            "time": df["time"][i],
-            "price": df["high"][i],
-            "type": "SH"
-        })
 
-    # Swing Low
-    if (
-        df["low"][i] < df["low"][i-1]
-        and df["low"][i] < df["low"][i-2]
-        and df["low"][i] < df["low"][i-3]
-        and df["low"][i] < df["low"][i+1]
-        and df["low"][i] < df["low"][i+2]
-        and df["low"][i] < df["low"][i+3]
+        bos = self.get_bos(df)
+
+        total = (
+            self.bullish_bos
+            + self.bearish_bos
+        )
+
+        print()
+
+        print("=" * 60)
+        print("BOS DETECTOR V4 REPORT")
+        print("=" * 60)
+
+        print(f"Total Structure : {len(df[df['structure'].notna()]):,}")
+        print(f"Bullish BOS     : {self.bullish_bos:,}")
+        print(f"Bearish BOS     : {self.bearish_bos:,}")
+        print(f"Total BOS       : {total:,}")
+
+        if len(df[df["structure"].notna()]) > 0:
+
+            ratio = (
+                total
+                /
+                len(df[df["structure"].notna()])
+            ) * 100
+
+            print(f"BOS Ratio       : {ratio:.2f}%")
+
+        print("=" * 60)
+
+    # =====================================================
+    # Summary
+    # =====================================================
+
+    def summary(
+        self,
+        df: pd.DataFrame
     ):
-        swings.append({
-            "index": i,
-            "time": df["time"][i],
-            "price": df["low"][i],
-            "type": "SL"
-        })
 
-# ----------------------------------
-# SORT
-# ----------------------------------
+        bos = self.get_bos(df)
 
-swings.sort(key=lambda x: x["index"])
+        print("\nFirst 20 BOS Events\n")
 
-# ----------------------------------
-# CLEAN SAME-TYPE SWINGS
-# ----------------------------------
+        if bos.empty:
 
-cleaned = []
+            print("No BOS detected.")
+            return
 
-for swing in swings:
+        print(
+            bos[
+                [
+                    "index",
+                    "time",
+                    "bos_type",
+                    "bos_level"
+                ]
+            ].head(20)
+        )
 
-    if not cleaned:
-        cleaned.append(swing)
-        continue
 
-    last = cleaned[-1]
+# =========================================================
+# TEST
+# =========================================================
 
-    if swing["type"] == last["type"]:
+if __name__ == "__main__":
 
-        if swing["type"] == "SH":
+    from config import HISTORICAL_FILE
 
-            if swing["price"] > last["price"]:
-                cleaned[-1] = swing
+    from analysis.swing_detector_v3 import SwingDetector
+    from analysis.market_structure_v4 import MarketStructure
 
-        else:
+    print("=" * 60)
+    print("QUANTEDGE BOS DETECTOR V4")
+    print("=" * 60)
 
-            if swing["price"] < last["price"]:
-                cleaned[-1] = swing
+    # ---------------------------------------------
+    # Load Historical Data
+    # ---------------------------------------------
 
-    else:
-        cleaned.append(swing)
+    df = pd.read_csv(HISTORICAL_FILE)
 
-# ----------------------------------
-# DISTANCE FILTER
-# ----------------------------------
+    print(f"Candles Loaded : {len(df):,}")
 
-filtered = []
+    # ---------------------------------------------
+    # Swing Detector
+    # ---------------------------------------------
 
-for swing in cleaned:
+    swing = SwingDetector()
 
-    if not filtered:
-        filtered.append(swing)
-        continue
+    df = swing.run(df)
 
-    last = filtered[-1]
+    # ---------------------------------------------
+    # Market Structure
+    # ---------------------------------------------
 
-    distance = abs(
-        swing["price"] - last["price"]
+    structure = MarketStructure()
+
+    df = structure.run(df)
+
+    # ---------------------------------------------
+    # BOS Detector
+    # ---------------------------------------------
+
+    bos = BOSDetector()
+
+    df = bos.run(
+        df,
+        save_output=True
     )
 
-    if distance >= MIN_DISTANCE:
-        filtered.append(swing)
+    bos.report(df)
 
-# ----------------------------------
-# LABEL STRUCTURE
-# ----------------------------------
+    bos.summary(df)
 
-last_high = None
-last_low = None
+    print("\nValidation Complete")
 
-structure = []
-
-for swing in filtered:
-
-    if swing["type"] == "SH":
-
-        if last_high is None:
-            label = "SH"
-
-        elif swing["price"] > last_high:
-            label = "HH"
-
-        else:
-            label = "LH"
-
-        last_high = swing["price"]
-
-    else:
-
-        if last_low is None:
-            label = "SL"
-
-        elif swing["price"] > last_low:
-            label = "HL"
-
-        else:
-            label = "LL"
-
-        last_low = swing["price"]
-
-    swing["label"] = label
-    structure.append(swing)
-
-# ----------------------------------
-# BOS V4
-# ----------------------------------
-
-print("\n===== BOS V4 =====\n")
-
-bos_events = []
-
-bullish_bos_count = 0
-bearish_bos_count = 0
-
-for swing in structure:
-
-    # -----------------------
-    # Bullish BOS
-    # -----------------------
-
-    if swing["label"] == "HH":
-
-        level = swing["price"]
-
-        for j in range(
-            swing["index"] + 1,
-            len(df)
-        ):
-
-            if df["close"][j] > level:
-
-                bos_events.append({
-                    "time": df["time"][j],
-                    "type": "Bullish BOS",
-                    "level": level
-                })
-
-                bullish_bos_count += 1
-                break
-
-    # -----------------------
-    # Bearish BOS
-    # -----------------------
-
-    elif swing["label"] == "LL":
-
-        level = swing["price"]
-
-        for j in range(
-            swing["index"] + 1,
-            len(df)
-        ):
-
-            if df["close"][j] < level:
-
-                bos_events.append({
-                    "time": df["time"][j],
-                    "type": "Bearish BOS",
-                    "level": level
-                })
-
-                bearish_bos_count += 1
-                break
-
-# ----------------------------------
-# SAVE BOS EVENTS
-# ----------------------------------
-
-bos_df = pd.DataFrame(bos_events)
-
-bos_df.to_csv(
-    "../outputs/bos_events_v4.csv",
-    index=False
-)
-
-# ----------------------------------
-# REPORT
-# ----------------------------------
-
-print("\n===== BOS REPORT =====\n")
-
-print(f"Filtered Structure : {len(structure):,}")
-
-print(f"Bullish BOS        : {bullish_bos_count:,}")
-print(f"Bearish BOS        : {bearish_bos_count:,}")
-
-print(
-    f"Total BOS          : "
-    f"{bullish_bos_count + bearish_bos_count:,}"
-)
-
-print(
-    f"BOS Ratio          : "
-    f"{((bullish_bos_count + bearish_bos_count) / len(structure)) * 100:.2f}%"
-)
-
-print(
-    "\nSaved: "
-    "../outputs/bos_events_v4.csv"
-)
+    print("=" * 60)

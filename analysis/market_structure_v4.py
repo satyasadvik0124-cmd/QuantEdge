@@ -1,250 +1,469 @@
+"""
+=========================================================
+QuantEdge V2
+Market Structure V4
+=========================================================
+
+Converts swing points into market structure
+(HH / HL / LH / LL)
+
+Input:
+    SwingDetector Output DataFrame
+
+Output:
+    Same DataFrame enriched with
+    market structure information
+
+Author : QuantEdge
+"""
+
+from pathlib import Path
+
 import pandas as pd
-import sys
-import os
 
-sys.path.append(
-    os.path.dirname(
-        os.path.dirname(__file__)
-    )
+from config import OUTPUT_FOLDER
+from config_backtest import PAIR
+from config_strategy import (
+    FOREX_MIN_SWING_DISTANCE,
+    XAU_MIN_SWING_DISTANCE
 )
 
-from config import PAIR, TIMEFRAME
+class MarketStructure:
 
-print(f"\nUsing: {PAIR}_{TIMEFRAME}")
+    def __init__(self):
+        
+      if PAIR == "XAUUSD":
+       MIN_DISTANCE = XAU_MIN_SWING_DISTANCE
+      else:
+       MIN_DISTANCE = FOREX_MIN_SWING_DISTANCE
 
-# ----------------------------------
-# LOAD DATA
-# ----------------------------------
+    # =====================================================
+    # Detect Market Structure
+    # =====================================================
 
-df = pd.read_csv(
-    f"../data/{PAIR}_{TIMEFRAME}.csv"
-)
+    def run(
+        self,
+        df: pd.DataFrame,
+        save_output=False
+    ) -> pd.DataFrame:
 
-# ----------------------------------
-# SETTINGS
-# ----------------------------------
+        df = df.copy()
 
-if PAIR == "XAUUSD":
-    MIN_DISTANCE = 5.0
-else:
-    MIN_DISTANCE = 0.0010  # 10 pips
+        # ---------------------------------------------
+        # Initialize Columns
+        # ---------------------------------------------
 
-# ----------------------------------
-# SWING DETECTOR V3
-# ----------------------------------
+        df["structure"] = None
 
-swings = []
+        # ---------------------------------------------
+        # Get Swing Points
+        # ---------------------------------------------
 
-for i in range(3, len(df) - 3):
+        swings = df[
+            df["swing_type"].notna()
+        ].copy()
 
-    # Swing High
-    if (
-        df["high"][i] > df["high"][i - 1]
-        and df["high"][i] > df["high"][i - 2]
-        and df["high"][i] > df["high"][i - 3]
-        and df["high"][i] > df["high"][i + 1]
-        and df["high"][i] > df["high"][i + 2]
-        and df["high"][i] > df["high"][i + 3]
+        swings = swings.reset_index()
+
+        swings.rename(
+            columns={
+                "index": "candle_index"
+            },
+            inplace=True
+        )
+
+        swings = swings[
+            [
+                "candle_index",
+                "time",
+                "swing_type",
+                "swing_price"
+            ]
+        ]
+
+        # ---------------------------------------------
+        # Sort
+        # ---------------------------------------------
+
+        swings = swings.sort_values(
+            "candle_index"
+        ).reset_index(drop=True)
+
+        # ---------------------------------------------
+        # Remove Consecutive Same Swings
+        # ---------------------------------------------
+
+        cleaned = []
+
+        for _, swing in swings.iterrows():
+
+            swing = swing.to_dict()
+
+            if not cleaned:
+
+                cleaned.append(swing)
+                continue
+
+            last = cleaned[-1]
+
+            if swing["swing_type"] == last["swing_type"]:
+
+                # -------------------------
+                # Higher High
+                # -------------------------
+
+                if swing["swing_type"] == "SH":
+
+                    if (
+                        swing["swing_price"]
+                        >
+                        last["swing_price"]
+                    ):
+
+                        cleaned[-1] = swing
+
+                # -------------------------
+                # Lower Low
+                # -------------------------
+
+                else:
+
+                    if (
+                        swing["swing_price"]
+                        <
+                        last["swing_price"]
+                    ):
+
+                        cleaned[-1] = swing
+
+            else:
+
+                cleaned.append(swing)
+
+        # ---------------------------------------------
+        # Distance Filter
+        # ---------------------------------------------
+
+        filtered = []
+
+        for swing in cleaned:
+
+            if not filtered:
+
+                filtered.append(swing)
+                continue
+
+            last = filtered[-1]
+
+            distance = abs(
+                swing["swing_price"]
+                -
+                last["swing_price"]
+            )
+
+            if distance >= self.min_distance:
+
+                filtered.append(swing)
+                        # ---------------------------------------------
+        # Label Market Structure
+        # ---------------------------------------------
+
+        last_high = None
+        last_low = None
+
+        structure = []
+
+        for swing in filtered:
+
+            # -----------------------------------------
+            # Swing High
+            # -----------------------------------------
+
+            if swing["swing_type"] == "SH":
+
+                if last_high is None:
+
+                    label = "SH"
+
+                elif swing["swing_price"] > last_high:
+
+                    label = "HH"
+
+                else:
+
+                    label = "LH"
+
+                last_high = swing["swing_price"]
+
+            # -----------------------------------------
+            # Swing Low
+            # -----------------------------------------
+
+            else:
+
+                if last_low is None:
+
+                    label = "SL"
+
+                elif swing["swing_price"] > last_low:
+
+                    label = "HL"
+
+                else:
+
+                    label = "LL"
+
+                last_low = swing["swing_price"]
+
+            swing["structure"] = label
+
+            structure.append(swing)
+
+        # ---------------------------------------------
+        # Write Labels Back To DataFrame
+        # ---------------------------------------------
+
+        for swing in structure:
+
+            candle = swing["candle_index"]
+
+            df.loc[
+                candle,
+                "structure"
+            ] = swing["structure"]
+
+        # ---------------------------------------------
+        # Optional CSV Export
+        # ---------------------------------------------
+
+        if save_output:
+
+            Path(
+                OUTPUT_FOLDER
+            ).mkdir(
+                exist_ok=True
+            )
+
+            structure_df = pd.DataFrame(
+                structure
+            )
+
+            structure_df.to_csv(
+                f"{OUTPUT_FOLDER}/market_structure_v4.csv",
+                index=False
+            )
+
+        return df
+
+    # =====================================================
+    # Get Structure Points
+    # =====================================================
+
+    def get_structure(
+        self,
+        df: pd.DataFrame
+    ) -> pd.DataFrame:
+
+        structure = df[
+            df["structure"].notna()
+        ].copy()
+
+        return structure.reset_index(
+            drop=False
+        )
+
+    # =====================================================
+    # Report
+    # =====================================================
+
+    def report(
+        self,
+        df: pd.DataFrame
     ):
-        swings.append({
-            "index": i,
-            "time": df["time"][i],
-            "price": df["high"][i],
-            "type": "SH"
-        })
 
-    # Swing Low
-    if (
-        df["low"][i] < df["low"][i - 1]
-        and df["low"][i] < df["low"][i - 2]
-        and df["low"][i] < df["low"][i - 3]
-        and df["low"][i] < df["low"][i + 1]
-        and df["low"][i] < df["low"][i + 2]
-        and df["low"][i] < df["low"][i + 3]
+        structure = self.get_structure(df)
+
+        hh = len(
+            structure[
+                structure["structure"] == "HH"
+            ]
+        )
+
+        hl = len(
+            structure[
+                structure["structure"] == "HL"
+            ]
+        )
+
+        lh = len(
+            structure[
+                structure["structure"] == "LH"
+            ]
+        )
+
+        ll = len(
+            structure[
+                structure["structure"] == "LL"
+            ]
+        )
+
+        sh = len(
+            structure[
+                structure["structure"] == "SH"
+            ]
+        )
+
+        sl = len(
+            structure[
+                structure["structure"] == "SL"
+            ]
+        )
+
+        print()
+
+        print("=" * 60)
+        print("MARKET STRUCTURE REPORT")
+        print("=" * 60)
+
+        print(f"Initial SH      : {sh}")
+        print(f"Initial SL      : {sl}")
+
+        print()
+
+        print(f"HH Count        : {hh}")
+        print(f"HL Count        : {hl}")
+        print(f"LH Count        : {lh}")
+        print(f"LL Count        : {ll}")
+
+        print()
+
+        print(
+            f"Total Structure : {len(structure)}"
+        )
+
+        print("=" * 60)
+
+            # =====================================================
+    # Get Structure Points
+    # =====================================================
+
+    def get_structure(
+        self,
+        df: pd.DataFrame
+    ) -> pd.DataFrame:
+        """
+        Returns only the market structure points.
+
+        Output Columns
+        --------------
+        index
+        time
+        price
+        type
+        label
+        """
+
+        structure = df[
+            df["structure"].notna()
+        ].copy()
+
+        structure = structure.reset_index()
+
+        structure.rename(
+            columns={
+                "index": "index",
+                "structure": "label",
+                "swing_type": "type",
+                "swing_price": "price"
+            },
+            inplace=True
+        )
+
+        structure = structure[
+            [
+                "index",
+                "time",
+                "price",
+                "type",
+                "label"
+            ]
+        ]
+
+        return structure
+            # =====================================================
+    # Summary
+    # =====================================================
+
+    def summary(
+        self,
+        df: pd.DataFrame
     ):
-        swings.append({
-            "index": i,
-            "time": df["time"][i],
-            "price": df["low"][i],
-            "type": "SL"
-        })
 
-# ----------------------------------
-# SORT
-# ----------------------------------
+        structure = self.get_structure(df)
 
-swings.sort(key=lambda x: x["index"])
+        print("\nFirst 20 Structure Points\n")
 
-# ----------------------------------
-# CLEAN SAME TYPE SWINGS
-# ----------------------------------
+        print(
+            structure[
+                [
+                    "index",
+                    "time",
+                    "structure",
+                    "swing_price"
+                ]
+            ].head(20)
+        )
 
-cleaned = []
 
-for swing in swings:
+# =========================================================
+# TEST
+# =========================================================
 
-    if not cleaned:
-        cleaned.append(swing)
-        continue
+if __name__ == "__main__":
 
-    last = cleaned[-1]
+    from config_backtest import HISTORICAL_FILE
+    from analysis.swing_detector_v3 import SwingDetector
 
-    if swing["type"] == last["type"]:
+    print("=" * 60)
+    print("QUANTEDGE MARKET STRUCTURE V4")
+    print("=" * 60)
 
-        if swing["type"] == "SH":
+    # -----------------------------------------------------
+    # Load Historical Data
+    # -----------------------------------------------------
 
-            if swing["price"] > last["price"]:
-                cleaned[-1] = swing
+    df = pd.read_csv(HISTORICAL_FILE)
 
-        else:
+    print(f"Candles Loaded : {len(df):,}")
 
-            if swing["price"] < last["price"]:
-                cleaned[-1] = swing
+    # -----------------------------------------------------
+    # Swing Detection
+    # -----------------------------------------------------
 
-    else:
-        cleaned.append(swing)
+    swing_detector = SwingDetector()
 
-# ----------------------------------
-# DISTANCE FILTER
-# ----------------------------------
-
-filtered = []
-
-for swing in cleaned:
-
-    if not filtered:
-        filtered.append(swing)
-        continue
-
-    last = filtered[-1]
-
-    distance = abs(
-        swing["price"] - last["price"]
+    df = swing_detector.run(
+        df,
+        save_output=False
     )
 
-    if distance >= MIN_DISTANCE:
-        filtered.append(swing)
+    swing_detector.report(df)
 
-# ----------------------------------
-# LABEL STRUCTURE
-# ----------------------------------
+    # -----------------------------------------------------
+    # Market Structure
+    # -----------------------------------------------------
 
-last_high = None
-last_low = None
+    structure_detector = MarketStructure()
 
-structure = []
+    df = structure_detector.run(
+        df,
+        save_output=True
+    )
 
-print("\n===== MARKET STRUCTURE V4 =====\n")
+    structure_detector.report(df)
 
-for swing in filtered:
+    structure_detector.summary(df)
 
-    if swing["type"] == "SH":
+    print("\nValidation Complete")
 
-        if last_high is None:
-            label = "SH"
-
-        elif swing["price"] > last_high:
-            label = "HH"
-
-        else:
-            label = "LH"
-
-        last_high = swing["price"]
-
-    else:
-
-        if last_low is None:
-            label = "SL"
-
-        elif swing["price"] > last_low:
-            label = "HL"
-
-        else:
-            label = "LL"
-
-        last_low = swing["price"]
-
-    swing["label"] = label
-
-    structure.append(swing)
-
-# ----------------------------------
-# REPORTING
-# ----------------------------------
-
-hh_count = sum(
-    1 for s in structure
-    if s["label"] == "HH"
-)
-
-hl_count = sum(
-    1 for s in structure
-    if s["label"] == "HL"
-)
-
-lh_count = sum(
-    1 for s in structure
-    if s["label"] == "LH"
-)
-
-ll_count = sum(
-    1 for s in structure
-    if s["label"] == "LL"
-)
-
-sh_count = sum(
-    1 for s in structure
-    if s["label"] == "SH"
-)
-
-sl_count = sum(
-    1 for s in structure
-    if s["label"] == "SL"
-)
-
-print("\n===== MARKET STRUCTURE REPORT =====\n")
-
-print(f"Original Swings : {len(swings):,}")
-print(f"Cleaned Swings  : {len(cleaned):,}")
-print(f"Filtered Swings : {len(filtered):,}")
-
-print()
-
-print(f"Initial SH      : {sh_count}")
-print(f"Initial SL      : {sl_count}")
-
-print()
-
-print(f"HH Count        : {hh_count:,}")
-print(f"HL Count        : {hl_count:,}")
-print(f"LH Count        : {lh_count:,}")
-print(f"LL Count        : {ll_count:,}")
-
-print()
-
-print(
-    f"Total Structure : "
-    f"{len(structure):,}"
-)
-
-print(
-    f"Reduction Rate  : "
-    f"{((len(swings) - len(filtered)) / len(swings)) * 100:.2f}%"
-)
-
-# ----------------------------------
-# SAVE CSV
-# ----------------------------------
-
-structure_df = pd.DataFrame(
-    structure
-)
-
-structure_df.to_csv(
-    "../outputs/market_structure_v4.csv",
-    index=False
-)
-
-print(
-    "\nSaved ../outputs/market_structure_v4.csv"
-)
+    print("=" * 60)

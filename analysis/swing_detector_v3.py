@@ -1,104 +1,219 @@
+"""
+=========================================================
+QuantEdge V2
+Swing Detector V3
+=========================================================
+
+3 Left + 3 Right Swing Detection
+
+Architecture:
+    Input  : OHLC DataFrame
+    Output : Same DataFrame enriched with swing metadata
+
+Author : QuantEdge
+"""
+
+from pathlib import Path
+
 import pandas as pd
-import sys
-import os
 
-# ----------------------------------
-# Setup
-# ----------------------------------
+from config import OUTPUT_FOLDER
 
-sys.path.append(
-    os.path.dirname(
-        os.path.dirname(__file__)
-    )
-)
 
-from config import PAIR, TIMEFRAME
+class SwingDetector:
 
-print(PAIR)
-print(TIMEFRAME)
-# ----------------------------------
-# Load Data
-# ----------------------------------
+    def __init__(self):
 
-df = pd.read_csv(
-    f"../data/{PAIR}_{TIMEFRAME}.csv"
-)
+        self.swing_highs = []
+        self.swing_lows = []
 
-print("\nDataset Loaded Successfully")
-print("Rows:", len(df))
-print("Columns:", df.columns.tolist())
-print(df.head())
-print(df["close"].head())
-# ----------------------------------
-# Swing Detection V3
-# 3 candles left + 3 candles right
-# ----------------------------------
+    # =====================================================
+    # Detect Swings
+    # =====================================================
 
-swing_highs = []
-swing_lows = []
+    def run(
+        self,
+        df: pd.DataFrame,
+        save_output: bool = False
+    ) -> pd.DataFrame:
 
-for i in range(3, len(df) - 3):
+        df = df.copy()
 
-    # Swing High
-    if (
-        df["high"][i] > df["high"][i - 1]
-        and df["high"][i] > df["high"][i - 2]
-        and df["high"][i] > df["high"][i - 3]
-        and df["high"][i] > df["high"][i + 1]
-        and df["high"][i] > df["high"][i + 2]
-        and df["high"][i] > df["high"][i + 3]
+        self.swing_highs.clear()
+        self.swing_lows.clear()
+
+        # -------------------------------------------------
+        # Initialize Columns
+        # -------------------------------------------------
+
+        df["swing_high"] = False
+        df["swing_low"] = False
+
+        df["swing_type"] = None
+        df["swing_price"] = None
+
+        # -------------------------------------------------
+        # Swing Detection
+        # -------------------------------------------------
+
+        for i in range(3, len(df) - 3):
+
+            # =============================================
+            # Swing High
+            # =============================================
+
+            if (
+
+                df.loc[i, "high"] > df.loc[i - 1, "high"]
+                and df.loc[i, "high"] > df.loc[i - 2, "high"]
+                and df.loc[i, "high"] > df.loc[i - 3, "high"]
+
+                and df.loc[i, "high"] > df.loc[i + 1, "high"]
+                and df.loc[i, "high"] > df.loc[i + 2, "high"]
+                and df.loc[i, "high"] > df.loc[i + 3, "high"]
+
+            ):
+
+                self.swing_highs.append(i)
+
+                df.loc[i, "swing_high"] = True
+                df.loc[i, "swing_type"] = "SH"
+                df.loc[i, "swing_price"] = df.loc[i, "high"]
+
+            # =============================================
+            # Swing Low
+            # =============================================
+
+            if (
+
+                df.loc[i, "low"] < df.loc[i - 1, "low"]
+                and df.loc[i, "low"] < df.loc[i - 2, "low"]
+                and df.loc[i, "low"] < df.loc[i - 3, "low"]
+
+                and df.loc[i, "low"] < df.loc[i + 1, "low"]
+                and df.loc[i, "low"] < df.loc[i + 2, "low"]
+                and df.loc[i, "low"] < df.loc[i + 3, "low"]
+
+            ):
+
+                self.swing_lows.append(i)
+
+                df.loc[i, "swing_low"] = True
+                df.loc[i, "swing_type"] = "SL"
+                df.loc[i, "swing_price"] = df.loc[i, "low"]
+
+        # -------------------------------------------------
+        # Optional CSV Export
+        # -------------------------------------------------
+
+        if save_output:
+
+            Path(OUTPUT_FOLDER).mkdir(
+                exist_ok=True
+            )
+
+            df.to_csv(
+                f"{OUTPUT_FOLDER}/swings_v3.csv",
+                index=False
+            )
+
+        return df
+
+    # =====================================================
+    # Report
+    # =====================================================
+
+    def report(
+        self,
+        df: pd.DataFrame
     ):
-        swing_highs.append(i)
 
-    # Swing Low
-    if (
-        df["low"][i] < df["low"][i - 1]
-        and df["low"][i] < df["low"][i - 2]
-        and df["low"][i] < df["low"][i - 3]
-        and df["low"][i] < df["low"][i + 1]
-        and df["low"][i] < df["low"][i + 2]
-        and df["low"][i] < df["low"][i + 3]
+        total_swings = (
+            len(self.swing_highs)
+            + len(self.swing_lows)
+        )
+
+        density = (
+            total_swings / len(df)
+        ) * 100
+
+        print()
+
+        print("=" * 60)
+        print("SWING DETECTOR V3 REPORT")
+        print("=" * 60)
+
+        print(f"Total Candles : {len(df):,}")
+        print(f"Swing Highs   : {len(self.swing_highs):,}")
+        print(f"Swing Lows    : {len(self.swing_lows):,}")
+        print(f"Total Swings  : {total_swings:,}")
+        print(f"Swing Density : {density:.2f}%")
+
+        print("=" * 60)
+            # =====================================================
+    # Get Swing Points
+    # =====================================================
+
+    def get_swings(
+        self,
+        df: pd.DataFrame
+    ) -> pd.DataFrame:
+        """
+        Returns only swing candles.
+        This DataFrame will be used by
+        Market Structure V4.
+        """
+
+        swings = df[
+            df["swing_type"].notna()
+        ].copy()
+
+        return swings.reset_index(drop=False)
+
+    # =====================================================
+    # Summary
+    # =====================================================
+
+    def summary(
+        self,
+        df: pd.DataFrame
     ):
-        swing_lows.append(i)
 
-# ----------------------------------
-# Statistics
-# ----------------------------------
+        swings = self.get_swings(df)
 
-total_swings = len(swing_highs) + len(swing_lows)
+        print("\nFirst 10 Swings\n")
 
-print("\n" + "=" * 40)
-print("SWING DETECTOR V3 REPORT")
-print("=" * 40)
+        print(
+            swings[
+                [
+                    "index",
+                    "time",
+                    "swing_type",
+                    "swing_price"
+                ]
+            ].head(10)
+        )
 
-print(f"Total Candles : {len(df):,}")
-print(f"Swing Highs   : {len(swing_highs):,}")
-print(f"Swing Lows    : {len(swing_lows):,}")
-print(f"Total Swings  : {total_swings:,}")
 
-print(
-    f"Swing Density : "
-    f"{(total_swings / len(df)) * 100:.2f}%"
-)
+# =========================================================
+# TEST
+# =========================================================
 
-# ----------------------------------
-# Sample Output
-# ----------------------------------
+if __name__ == "__main__":
 
-print("\nFirst 10 Swing Highs:\n")
+    from config_backtest import HISTORICAL_FILE
 
-for idx in swing_highs[:10]:
-    print(
-        f"{df['time'][idx]} | "
-        f"{df['high'][idx]}"
+    df = pd.read_csv(HISTORICAL_FILE)
+
+    detector = SwingDetector()
+
+    df = detector.run(
+        df,
+        save_output=True
     )
 
-print("\nFirst 10 Swing Lows:\n")
+    detector.report(df)
 
-for idx in swing_lows[:10]:
-    print(
-        f"{df['time'][idx]} | "
-        f"{df['low'][idx]}"
-    )
+    detector.summary(df)
 
-print("\nValidation Complete")
+    print("\nValidation Complete")

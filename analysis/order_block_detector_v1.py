@@ -1,192 +1,422 @@
+"""
+=========================================================
+QuantEdge V2
+Order Block Detector V1
+=========================================================
+
+Detects Bullish and Bearish
+Order Blocks after
+Validated Liquidity Sweeps.
+
+Author : QuantEdge
+"""
+
+from pathlib import Path
+
 import pandas as pd
-import sys
-import os
 
-sys.path.append(
-    os.path.dirname(
-        os.path.dirname(__file__)
-    )
-)
+from config import OUTPUT_FOLDER
 
-from config import PAIR, TIMEFRAME
 
-print(f"\nUsing: {PAIR}_{TIMEFRAME}")
+class OrderBlockDetector:
 
-# ==================================
-# LOAD DATA
-# ==================================
+    def __init__(self):
 
-price_df = pd.read_csv(
-    f"../data/{PAIR}_{TIMEFRAME}.csv"
-)
+        self.lookback = 20
 
-price_df["time"] = pd.to_datetime(
-    price_df["time"]
-)
+        self.bullish_ob = 0
+        self.bearish_ob = 0
 
-sweeps_df = pd.read_csv(
-    "../outputs/validated_sweeps_v2.csv"
-)
+    # =====================================================
+    # Detect Order Blocks
+    # =====================================================
 
-if sweeps_df.empty:
-    print("No validated sweeps found.")
-    exit()
+    def run(
+        self,
+        df: pd.DataFrame,
+        save_output=False
+    ) -> pd.DataFrame:
 
-sweeps_df["choch_time"] = pd.to_datetime(
-    sweeps_df["choch_time"]
-)
+        df = df.copy()
 
-order_blocks = []
+        # -----------------------------------------
+        # Initialize Columns
+        # -----------------------------------------
 
-print("\n===== ORDER BLOCK DETECTOR V1 =====\n")
+        df["order_block"] = False
+        df["ob_type"] = None
+        df["ob_high"] = None
+        df["ob_low"] = None
 
-# ==================================
-# FIND ORDER BLOCKS
-# ==================================
+        validated = df[
+            df["validated_sweep"] == True
+        ].copy()
 
-for _, sweep in sweeps_df.iterrows():
+        validated = validated.reset_index()
 
-    choch_time = sweep["choch_time"]
-    sweep_type = sweep["type"]
-
-    choch_rows = price_df[
-        price_df["time"] == choch_time
-    ]
-
-    if choch_rows.empty:
-        continue
-
-    choch_idx = choch_rows.index[0]
-
-    # Debug (first few only)
-    if len(order_blocks) < 5:
-        print(
-            f"CHOCH={choch_time} | "
-            f"TYPE={sweep_type} | "
-            f"IDX={choch_idx}"
+        validated.rename(
+            columns={
+                "index": "candle_index"
+            },
+            inplace=True
         )
 
-    # ==================================
-    # SSL_SWEEP -> BULLISH OB
-    # Find last bearish candle
-    # ==================================
+        order_blocks = []
 
-    if sweep_type == "SSL_SWEEP":
+        self.bullish_ob = 0
+        self.bearish_ob = 0
 
-        for i in range(
-            choch_idx - 1,
-            max(0, choch_idx - 20),
-            -1
-        ):
+        print()
+        print("=" * 60)
+        print("ORDER BLOCK DETECTOR V1")
+        print("=" * 60)
 
-            candle = price_df.iloc[i]
+        # -----------------------------------------
+        # Detect Order Blocks
+        # -----------------------------------------
+        for _, sweep in validated.iterrows():
 
-            if candle["close"] < candle["open"]:
+            choch_idx = int(
+                sweep["candle_index"]
+            )
 
-                order_blocks.append({
-                    "time": candle["time"],
-                    "type": "BULLISH_OB",
-                    "high": candle["high"],
-                    "low": candle["low"]
-                })
+            sweep_type = sweep["validated_type"]
 
-                break
+            # -------------------------------------
+            # Debug (First 5 Only)
+            # -------------------------------------
 
-    # ==================================
-    # BSL_SWEEP -> BEARISH OB
-    # Find last bullish candle
-    # ==================================
+            if len(order_blocks) < 5:
 
-    elif sweep_type == "BSL_SWEEP":
+                print(
 
-        for i in range(
-            choch_idx - 1,
-            max(0, choch_idx - 20),
-            -1
-        ):
+                    f"CHOCH Index={choch_idx} | "
+                    f"TYPE={sweep_type}"
 
-            candle = price_df.iloc[i]
+                )
 
-            if candle["close"] > candle["open"]:
+            # =====================================
+            # SSL Sweep
+            # → Bullish Order Block
+            # =====================================
 
-                order_blocks.append({
-                    "time": candle["time"],
-                    "type": "BEARISH_OB",
-                    "high": candle["high"],
-                    "low": candle["low"]
-                })
+            if sweep_type == "SSL_SWEEP":
 
-                break
+                for i in range(
 
-# ==================================
-# DATAFRAME
-# ==================================
+                    choch_idx - 1,
 
-ob_df = pd.DataFrame(order_blocks)
+                    max(
+                        0,
+                        choch_idx - self.lookback
+                    ),
 
-if not ob_df.empty:
+                    -1
 
-    ob_df = ob_df.drop_duplicates()
+                ):
 
-    ob_df = (
-        ob_df
-        .sort_values(by="time")
-        .reset_index(drop=True)
+                    candle = df.iloc[i]
+
+                    if candle["close"] < candle["open"]:
+
+                        df.loc[
+                            i,
+                            "order_block"
+                        ] = True
+
+                        df.loc[
+                            i,
+                            "ob_type"
+                        ] = "BULLISH_OB"
+
+                        df.loc[
+                            i,
+                            "ob_high"
+                        ] = candle["high"]
+
+                        df.loc[
+                            i,
+                            "ob_low"
+                        ] = candle["low"]
+
+                        order_blocks.append({
+
+                            "time": candle["time"],
+                            "type": "BULLISH_OB",
+                            "high": candle["high"],
+                            "low": candle["low"]
+
+                        })
+
+                        self.bullish_ob += 1
+
+                        break
+
+            # =====================================
+            # BSL Sweep
+            # → Bearish Order Block
+            # =====================================
+
+            elif sweep_type == "BSL_SWEEP":
+
+                for i in range(
+
+                    choch_idx - 1,
+
+                    max(
+                        0,
+                        choch_idx - self.lookback
+                    ),
+
+                    -1
+
+                ):
+
+                    candle = df.iloc[i]
+
+                    if candle["close"] > candle["open"]:
+
+                        df.loc[
+                            i,
+                            "order_block"
+                        ] = True
+
+                        df.loc[
+                            i,
+                            "ob_type"
+                        ] = "BEARISH_OB"
+
+                        df.loc[
+                            i,
+                            "ob_high"
+                        ] = candle["high"]
+
+                        df.loc[
+                            i,
+                            "ob_low"
+                        ] = candle["low"]
+
+                        order_blocks.append({
+
+                            "time": candle["time"],
+                            "type": "BEARISH_OB",
+                            "high": candle["high"],
+                            "low": candle["low"]
+
+                        })
+
+                        self.bearish_ob += 1
+
+                        break
+
+        # -----------------------------------------
+        # Remove Duplicates
+        # -----------------------------------------
+
+        ob_df = pd.DataFrame(
+            order_blocks
+        )
+
+        if not ob_df.empty:
+
+            ob_df = (
+
+                ob_df
+                .drop_duplicates()
+                .sort_values(
+                    by="time"
+                )
+                .reset_index(
+                    drop=True
+                )
+
+            )
+
+        # -----------------------------------------
+        # Optional CSV Export
+        # -----------------------------------------
+
+        if save_output:
+
+            Path(
+                OUTPUT_FOLDER
+            ).mkdir(
+                exist_ok=True
+            )
+
+            ob_df.to_csv(
+
+                f"{OUTPUT_FOLDER}/order_blocks_v1.csv",
+
+                index=False
+
+            )
+
+        return df
+        # =====================================================
+    # Get Order Blocks
+    # =====================================================
+
+    def get_order_blocks(
+        self,
+        df: pd.DataFrame
+    ) -> pd.DataFrame:
+
+        order_blocks = df[
+            df["order_block"] == True
+        ].copy()
+
+        return order_blocks.reset_index(
+            drop=False
+        )
+
+    # =====================================================
+    # Report
+    # =====================================================
+
+    def report(
+        self,
+        df: pd.DataFrame
+    ):
+
+        order_blocks = self.get_order_blocks(df)
+
+        total = (
+            self.bullish_ob
+            + self.bearish_ob
+        )
+
+        validated_count = len(
+            df[df["validated_sweep"] == True]
+        )
+
+        print()
+
+        print("=" * 60)
+        print("ORDER BLOCK DETECTOR V1 REPORT")
+        print("=" * 60)
+
+        print(
+            f"Bullish Order Blocks : "
+            f"{self.bullish_ob:,}"
+        )
+
+        print(
+            f"Bearish Order Blocks : "
+            f"{self.bearish_ob:,}"
+        )
+
+        print(
+            f"Total Order Blocks   : "
+            f"{total:,}"
+        )
+
+        if validated_count > 0:
+
+            rate = (
+                total / validated_count
+            ) * 100
+
+            print(
+                f"OB Conversion Rate   : "
+                f"{rate:.2f}%"
+            )
+
+        print("=" * 60)
+
+    # =====================================================
+    # Summary
+    # =====================================================
+
+    def summary(
+        self,
+        df: pd.DataFrame
+    ):
+
+        order_blocks = self.get_order_blocks(df)
+
+        print("\nFirst 20 Order Blocks\n")
+
+        if order_blocks.empty:
+
+            print("No Order Blocks Found.")
+            return
+
+        print(
+
+            order_blocks[
+                [
+                    "index",
+                    "time",
+                    "ob_type",
+                    "ob_high",
+                    "ob_low"
+                ]
+            ].head(20)
+
+        )
+
+
+# =========================================================
+# TEST
+# =========================================================
+
+if __name__ == "__main__":
+
+    from config import HISTORICAL_FILE
+
+    from analysis.swing_detector_v3 import SwingDetector
+    from analysis.market_structure_v4 import MarketStructure
+    from analysis.liquidity_detector_v2 import LiquidityDetector
+    from analysis.liquidity_sweep_detector_v2 import (
+        LiquiditySweepDetector
+    )
+    from analysis.choch_detector_v3 import CHOCHDetector
+    from analysis.validated_sweeps_v2 import (
+        ValidatedSweepDetector
     )
 
-# ==================================
-# SAVE
-# ==================================
+    print("=" * 60)
+    print("QUANTEDGE ORDER BLOCK DETECTOR V1")
+    print("=" * 60)
 
-ob_df.to_csv(
-    "../outputs/order_blocks_v1.csv",
-    index=False
-)
+    # ---------------------------------------------
+    # Load Historical Data
+    # ---------------------------------------------
 
-# ==================================
-# REPORT
-# ==================================
-
-bullish_ob = 0
-bearish_ob = 0
-
-if not ob_df.empty:
-
-    bullish_ob = len(
-        ob_df[
-            ob_df["type"] == "BULLISH_OB"
-        ]
-    )
-
-    bearish_ob = len(
-        ob_df[
-            ob_df["type"] == "BEARISH_OB"
-        ]
-    )
-
-print("\n===== ORDER BLOCK REPORT =====\n")
-
-print(
-    f"Bullish Order Blocks : "
-    f"{bullish_ob:,}"
-)
-
-print(
-    f"Bearish Order Blocks : "
-    f"{bearish_ob:,}"
-)
-
-print(
-    f"Total Order Blocks   : "
-    f"{len(ob_df):,}"
-)
-
-if len(sweeps_df) > 0:
+    df = pd.read_csv(HISTORICAL_FILE)
 
     print(
-        f"OB Conversion Rate   : "
-        f"{(len(ob_df) / len(sweeps_df)) * 100:.2f}%"
+        f"Candles Loaded : {len(df):,}"
     )
 
-print("\nSaved:")
-print("../outputs/order_blocks_v1.csv")
+    # ---------------------------------------------
+    # Run Pipeline
+    # ---------------------------------------------
+
+    df = SwingDetector().run(df)
+
+    df = MarketStructure().run(df)
+
+    df = LiquidityDetector().run(df)
+
+    df = LiquiditySweepDetector().run(df)
+
+    df = CHOCHDetector().run(df)
+
+    df = ValidatedSweepDetector().run(df)
+
+    detector = OrderBlockDetector()
+
+    df = detector.run(
+        df,
+        save_output=True
+    )
+
+    detector.report(df)
+
+    detector.summary(df)
+
+    print("\nValidation Complete")
+
+    print("=" * 60)
