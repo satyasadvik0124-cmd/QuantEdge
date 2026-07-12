@@ -1,4 +1,4 @@
-# QuantEdge 🚀
+# QuantEdge 
 
 A Python-based quantitative Smart Money Concepts (SMC) research engine that transforms raw OHLC market data into market structure, liquidity zones, institutional footprints, trade signals, and performance analytics.
 
@@ -220,79 +220,119 @@ Generates:
 
 # Multi-Asset Validation Results
 
-QuantEdge was tested on 2 years of M15 data across multiple markets.
+QuantEdge was tested on **2 years of M15 historical data** across multiple markets.
 
 ## EURUSD
 
-| Metric | Value |
-|----------|----------|
-| Trades | 234 |
-| Wins | 88 |
-| Losses | 146 |
-| Win Rate | 37.61% |
-| Profit Factor | 1.81 |
-| Net R | 118R |
-| Expectancy | 0.50R |
+| Metric          | Value   |
+| --------------- | ------- |
+| Trades          | 236     |
+| Wins            | 89      |
+| Losses          | 147     |
+| Win Rate        | 37.71%  |
+| Profit Factor   | 1.82    |
+| Net R           | 120R    |
+| Expectancy      | 0.51R   |
 | Initial Capital | $10,000 |
-| Final Capital | $21,800 |
-| Return | 118% |
-| Max Drawdown | $1,700 |
-| Max Win Streak | 5 |
-| Max Loss Streak | 9 |
+| Final Capital   | $22,000 |
+| Return          | 120%    |
+| Max Win Streak  | 4       |
+| Max Loss Streak | 9       |
 
 ---
 
 ## GBPUSD
 
-| Metric | Value |
-|----------|----------|
-| Trades | 289 |
-| Wins | 110 |
-| Losses | 179 |
-| Win Rate | 38.06% |
-| Profit Factor | 1.84 |
-| Net R | 151R |
-| Expectancy | 0.52R |
+| Metric          | Value   |
+| --------------- | ------- |
+| Trades          | 295     |
+| Wins            | 113     |
+| Losses          | 182     |
+| Win Rate        | 38.31%  |
+| Profit Factor   | 1.86    |
+| Net R           | 157R    |
+| Expectancy      | 0.53R   |
 | Initial Capital | $10,000 |
-| Final Capital | $25,100 |
-| Return | 151% |
-| Max Drawdown | $1,500 |
-| Max Win Streak | 5 |
-| Max Loss Streak | 9 |
+| Final Capital   | $25,700 |
+| Return          | 157%    |
+| Max Win Streak  | 5       |
+| Max Loss Streak | 9       |
 
 ---
 
 ## XAUUSD
 
-| Metric | Value |
-|----------|----------|
-| Trades | 352 |
-| Wins | 126 |
-| Losses | 226 |
-| Win Rate | 35.80% |
-| Profit Factor | 1.67 |
-| Net R | 152R |
-| Expectancy | 0.43R |
+| Metric          | Value   |
+| --------------- | ------- |
+| Trades          | 347     |
+| Wins            | 122     |
+| Losses          | 225     |
+| Win Rate        | 35.16%  |
+| Profit Factor   | 1.63    |
+| Net R           | 141R    |
+| Expectancy      | 0.41R   |
 | Initial Capital | $10,000 |
-| Final Capital | $25,200 |
-| Return | 152% |
-| Max Drawdown | N/A |
-| Max Win Streak | 4 |
-| Max Loss Streak | 9 |
+| Final Capital   | $24,100 |
+| Return          | 141%    |
+| Max Win Streak  | 6       |
+| Max Loss Streak | 8       |
+
+---
+
+## USDCAD
+
+| Metric          | Value   |
+| --------------- | ------- |
+| Trades          | 218     |
+| Wins            | 81      |
+| Losses          | 137     |
+| Win Rate        | 37.16%  |
+| Profit Factor   | 1.77    |
+| Net R           | 106R    |
+| Expectancy      | 0.49R   |
+| Initial Capital | $10,000 |
+| Final Capital   | $20,600 |
+| Return          | 106%    |
+| Max Win Streak  | 4       |
+| Max Loss Streak | 12      |
+
+---
+
+## EURAUD
+
+| Metric          | Value   |
+| --------------- | ------- |
+| Trades          | 314     |
+| Wins            | 103     |
+| Losses          | 211     |
+| Win Rate        | 32.80%  |
+| Profit Factor   | 1.46    |
+| Net R           | 98R     |
+| Expectancy      | 0.31R   |
+| Initial Capital | $10,000 |
+| Final Capital   | $19,800 |
+| Return          | 98%     |
+| Max Win Streak  | 6       |
+| Max Loss Streak | 13      |
 
 ---
 
 # Research Summary
 
-| Asset | Trades | Win Rate | Profit Factor | Net R |
-|---------|---------:|---------:|---------:|---------:|
-| EURUSD | 234 | 37.61% | 1.81 | 118R |
-| GBPUSD | 289 | 38.06% | 1.84 | 151R |
-| XAUUSD | 352 | 35.80% | 1.67 | 152R |
+| Asset  | Trades | Win Rate | Profit Factor | Net R |
+| ------ | -----: | -------: | ------------: | ----: |
+| EURUSD |    236 |   37.71% |          1.82 |  120R |
+| GBPUSD |    295 |   38.31% |          1.86 |  157R |
+| XAUUSD |    347 |   35.16% |          1.63 |  141R |
+| USDCAD |    218 |   37.16% |          1.77 |  106R |
+| EURAUD |    314 |   32.80% |          1.46 |   98R |
 
-Total Trades Tested: **875**
+**Total Trades Tested:** **1,410**
 
-The strategy demonstrated positive expectancy and profitability across all tested markets, indicating robustness beyond a single asset class.
+The strategy demonstrated positive expectancy and profitability across multiple asset classes, including major Forex pairs, Gold, and cross-currency pairs. QuantEdge maintained a positive Profit Factor (>1.4) and positive expectancy across all validated markets, demonstrating that the Smart Money Concepts framework generalizes beyond a single instrument.
+
+> **Note:** Preliminary testing was also conducted on JPY pairs (USDJPY and GBPJPY). Due to the limited number of generated trades, those results are excluded from the validation summary until additional testing is completed.
+
 
 ---
 

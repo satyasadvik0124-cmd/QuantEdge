@@ -1,7 +1,20 @@
-import MetaTrader5 as mt5
-import pandas as pd
+"""
+=========================================================
+QuantEdge V2
+Historical MT5 Data Collector
+=========================================================
+
+Downloads historical OHLCV data from MT5
+and saves it into the data directory.
+
+Author : QuantEdge
+"""
+
 from datetime import datetime
 from pathlib import Path
+
+import MetaTrader5 as mt5
+import pandas as pd
 import sys
 import os
 
@@ -10,69 +23,135 @@ sys.path.append(
         os.path.dirname(__file__)
     )
 )
-from config import PAIR
-
-# -----------------------------
-# CONFIG
-# -----------------------------
-
-MT5_TIMEFRAME = mt5.TIMEFRAME_M15
-
-START_DATE = datetime(2024, 1, 1)
-END_DATE = datetime.now()
-
-OUTPUT_FILE = f"data/{PAIR}_M15_2Y.csv"
-
-# -----------------------------
-# MT5 CONNECTION
-# -----------------------------
-
-if not mt5.initialize():
-    print("❌ MT5 initialization failed")
-    quit()
-
-print("✅ Connected to MT5")
-print(f"📊 Downloading: {PAIR}")
-
-# -----------------------------
-# DOWNLOAD DATA
-# -----------------------------
-
-rates = mt5.copy_rates_range(
+from config import (
     PAIR,
-    MT5_TIMEFRAME,
-    START_DATE,
-    END_DATE
+    TIMEFRAME,
+    TIMEFRAME_NAME,
+    DATA_FOLDER,
+    HISTORICAL_FILE,
 )
 
-if rates is None:
-    print("❌ No data returned")
-    mt5.shutdown()
-    quit()
 
-df = pd.DataFrame(rates)
+class MT5Collector:
 
-df["time"] = pd.to_datetime(
-    df["time"],
-    unit="s"
-)
+    def __init__(self):
 
-# -----------------------------
-# SAVE CSV
-# -----------------------------
+        self.start_date = datetime(2024, 1, 1)
+        self.end_date = datetime.now()
 
-Path("data").mkdir(exist_ok=True)
+    # =====================================================
+    # Connect to MT5
+    # =====================================================
 
-df.to_csv(
-    OUTPUT_FILE,
-    index=False
-)
+    def connect(self):
 
-print(f"✅ Downloaded {len(df):,} candles")
-print(f"✅ Saved to {OUTPUT_FILE}")
+        print("\nConnecting to MetaTrader 5...")
 
-print("\nDate Range:")
-print(df["time"].min())
-print(df["time"].max())
+        if not mt5.initialize():
+            raise RuntimeError(
+                f"MT5 initialization failed.\n"
+                f"Error: {mt5.last_error()}"
+            )
 
-mt5.shutdown()
+        if not mt5.symbol_select(PAIR, True):
+
+            mt5.shutdown()
+
+            raise RuntimeError(
+                f"Failed to select symbol: {PAIR}"
+            )
+
+        print("Connected successfully.")
+
+    # =====================================================
+    # Disconnect MT5
+    # =====================================================
+
+    def disconnect(self):
+
+        mt5.shutdown()
+
+        print("MT5 connection closed.")
+
+    # =====================================================
+    # Download Historical Data
+    # =====================================================
+
+    def collect(self):
+
+        self.connect()
+
+        print("\nDownloading historical data...")
+        print(f"Symbol     : {PAIR}")
+        print(f"Timeframe  : {TIMEFRAME_NAME}")
+
+        rates = mt5.copy_rates_range(
+            PAIR,
+            TIMEFRAME,
+            self.start_date,
+            self.end_date
+        )
+
+        if rates is None:
+
+            self.disconnect()
+
+            raise RuntimeError(
+                f"Failed to download data for {PAIR}"
+            )
+
+        df = pd.DataFrame(rates)
+
+        if df.empty:
+
+            self.disconnect()
+
+            raise RuntimeError(
+                "No historical data returned."
+            )
+
+        df["time"] = pd.to_datetime(
+            df["time"],
+            unit="s"
+        )
+
+        df = (
+            df
+            .sort_values("time")
+            .reset_index(drop=True)
+        )
+
+        Path(DATA_FOLDER).mkdir(
+            exist_ok=True
+        )
+
+        df.to_csv(
+            HISTORICAL_FILE,
+            index=False
+        )
+
+        print("\n" + "=" * 60)
+        print("DOWNLOAD COMPLETE")
+        print("=" * 60)
+        print(f"Pair        : {PAIR}")
+        print(f"Timeframe   : {TIMEFRAME_NAME}")
+        print(f"Candles     : {len(df):,}")
+        print(f"Start       : {df['time'].min()}")
+        print(f"End         : {df['time'].max()}")
+        print(f"Saved To    : {HISTORICAL_FILE}")
+        print("=" * 60)
+
+        self.disconnect()
+
+        return df
+
+
+# =====================================================
+# TEST
+# =====================================================
+
+if __name__ == "__main__":
+
+    collector = MT5Collector()
+
+    collector.collect()
