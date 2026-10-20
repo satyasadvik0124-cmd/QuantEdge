@@ -1,6 +1,12 @@
 import pandas as pd
 
 # ==================================
+# RISK REWARD CONFIGURATION
+# ==================================
+
+RISK_REWARD = 4.0
+
+# ==================================
 # LOAD DATA
 # ==================================
 
@@ -30,7 +36,10 @@ fvgs["time"] = pd.to_datetime(
 
 signals = []
 
-print("\n===== SIGNAL GENERATOR V3 =====\n")
+print("\n===== SIGNAL GENERATOR V3 =====")
+print(f"Risk Reward Ratio: 1:{RISK_REWARD}")
+print()
+
 
 # ==================================
 # GENERATE SIGNALS
@@ -74,6 +83,10 @@ for _, sweep in sweeps.iterrows():
             by="distance"
         ).iloc[0]
 
+        # ==================================
+        # FIND BULLISH FVG
+        # ==================================
+
         matching_fvgs = fvgs[
             (fvgs["type"] == "BULLISH_FVG")
             &
@@ -88,6 +101,10 @@ for _, sweep in sweeps.iterrows():
         if matching_fvgs.empty:
             continue
 
+        # ==================================
+        # ENTRY / SL
+        # ==================================
+
         entry = ob["high"]
         sl = ob["low"]
 
@@ -96,18 +113,50 @@ for _, sweep in sweeps.iterrows():
         if risk <= 0:
             continue
 
-        tp = entry + (risk * 3)
+        # ==================================
+        # TAKE PROFIT - CONFIGURABLE RR
+        # ==================================
+
+        tp = entry + (risk * RISK_REWARD)
+
+        # ==================================
+        # SAVE BUY SIGNAL
+        # ==================================
 
         signals.append({
+
             "signal_time": ob["time"],
+
             "direction": "BUY",
-            "entry": round(entry, 5),
-            "sl": round(sl, 5),
-            "tp": round(tp, 5),
-            "risk": round(risk, 5),
-            "reward": round(risk * 3, 5),
-            "rr": 3
+
+            "entry": round(
+                entry,
+                5
+            ),
+
+            "sl": round(
+                sl,
+                5
+            ),
+
+            "tp": round(
+                tp,
+                5
+            ),
+
+            "risk": round(
+                risk,
+                5
+            ),
+
+            "reward": round(
+                risk * RISK_REWARD,
+                5
+            ),
+
+            "rr": RISK_REWARD
         })
+
 
     # ==================================
     # BSL_SWEEP -> SELL SIGNAL
@@ -142,6 +191,10 @@ for _, sweep in sweeps.iterrows():
             by="distance"
         ).iloc[0]
 
+        # ==================================
+        # FIND BEARISH FVG
+        # ==================================
+
         matching_fvgs = fvgs[
             (fvgs["type"] == "BEARISH_FVG")
             &
@@ -156,6 +209,10 @@ for _, sweep in sweeps.iterrows():
         if matching_fvgs.empty:
             continue
 
+        # ==================================
+        # ENTRY / SL
+        # ==================================
+
         entry = ob["low"]
         sl = ob["high"]
 
@@ -164,33 +221,72 @@ for _, sweep in sweeps.iterrows():
         if risk <= 0:
             continue
 
-        tp = entry - (risk * 3)
+        # ==================================
+        # TAKE PROFIT - CONFIGURABLE RR
+        # ==================================
+
+        tp = entry - (risk * RISK_REWARD)
+
+        # ==================================
+        # SAVE SELL SIGNAL
+        # ==================================
 
         signals.append({
+
             "signal_time": ob["time"],
+
             "direction": "SELL",
-            "entry": round(entry, 5),
-            "sl": round(sl, 5),
-            "tp": round(tp, 5),
-            "risk": round(risk, 5),
-            "reward": round(risk * 3, 5),
-            "rr": 3
+
+            "entry": round(
+                entry,
+                5
+            ),
+
+            "sl": round(
+                sl,
+                5
+            ),
+
+            "tp": round(
+                tp,
+                5
+            ),
+
+            "risk": round(
+                risk,
+                5
+            ),
+
+            "reward": round(
+                risk * RISK_REWARD,
+                5
+            ),
+
+            "rr": RISK_REWARD
         })
+
 
 # ==================================
 # DATAFRAME
 # ==================================
 
-signals_df = pd.DataFrame(signals)
+signals_df = pd.DataFrame(
+    signals
+)
 
 if not signals_df.empty:
 
     signals_df = (
         signals_df
         .drop_duplicates()
-        .sort_values(by="signal_time")
-        .reset_index(drop=True)
+        .sort_values(
+            by="signal_time"
+        )
+        .reset_index(
+            drop=True
+        )
     )
+
 
 # ==================================
 # SAVE
@@ -200,6 +296,7 @@ signals_df.to_csv(
     "../outputs/signals_v3.csv",
     index=False
 )
+
 
 # ==================================
 # REPORT
@@ -212,17 +309,22 @@ if not signals_df.empty:
 
     bullish_signals = len(
         signals_df[
-            signals_df["direction"] == "BUY"
+            signals_df["direction"]
+            == "BUY"
         ]
     )
 
     bearish_signals = len(
         signals_df[
-            signals_df["direction"] == "SELL"
+            signals_df["direction"]
+            == "SELL"
         ]
     )
 
-print("\n===== SIGNAL REPORT =====\n")
+
+print(
+    "\n===== SIGNAL REPORT =====\n"
+)
 
 print(
     f"Bullish Signals : "
@@ -246,5 +348,16 @@ if len(sweeps) > 0:
         f"{(len(signals_df) / len(sweeps)) * 100:.2f}%"
     )
 
-print("\nSaved:")
-print("../outputs/signals_v3.csv")
+
+print(
+    f"Risk Reward     : "
+    f"1:{RISK_REWARD}"
+)
+
+print(
+    "\nSaved:"
+)
+
+print(
+    "../outputs/signals_v3.csv"
+)

@@ -1,44 +1,25 @@
 import MetaTrader5 as mt5
 from pathlib import Path
 
-# ==========================================================
 # Project Root
-# ==========================================================
-
 BASE_DIR = Path(__file__).resolve().parent
 
-# ==========================================================
 # Trading Configuration
-# ==========================================================
-
-PAIR = "EURAUD"
-
+PAIR = "XAUUSD"
 TIMEFRAME = mt5.TIMEFRAME_M15
 TIMEFRAME_NAME = "M15"
 
-# ==========================================================
 # Directories
-# ==========================================================
-
 DATA_FOLDER = BASE_DIR / "data"
 OUTPUT_FOLDER = BASE_DIR / "outputs"
 
-# ==========================================================
 # Historical File
-# ==========================================================
+HISTORICAL_FILE = DATA_FOLDER / f"{PAIR}_{TIMEFRAME_NAME}_5Y.csv"
 
-HISTORICAL_FILE = DATA_FOLDER / f"{PAIR}_{TIMEFRAME_NAME}_2Y.csv"
-
-# ==========================================================
 # Risk
-# ==========================================================
-
 RISK_PERCENT = 1.0
 RISK_REWARD = 3.0
 
-# ==========================================================
 # Live
-# ==========================================================
-
 BARS = 500
 INCLUDE_CURRENT = False

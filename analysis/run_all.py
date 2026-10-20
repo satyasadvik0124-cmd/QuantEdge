@@ -11,6 +11,7 @@ files = [
     "fvg_detector_v2.py",
     "signal_generator_v3.py",
     "backtest_v1.py",
+    "ml_signal_model_v1.py",
     "equity_curve_v1.py",
     "drawdown_analyzer_v1.py",
     "performance_analyzer_v1.py"
