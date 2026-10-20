@@ -1,0 +1,33 @@
+QUANTEDGE XAUUSD M15 BACKTEST EXECUTION AUDIT
+========================================================================
+Candles scanned: 99,970
+Signals: 487
+Backtest results: 487
+Candle range: 2022-07-18 13:45:00 to 2026-10-19 15:15:00
+
+RECORDED RESULT DISTRIBUTION
+LOSS: 336
+WIN: 151
+
+DIAGNOSTIC COUNTS
+Signals with no detected issue: 270 / 487
+Signals with one or more flags: 217 / 487
+Entry not touched before first detected exit: 215
+SL and TP both touched in same M15 candle: 4
+No SL/TP hit in remaining candle history: 0
+Simple OHLC exit scan disagrees with recorded WIN/LOSS: 0
+
+FLAG COUNTS
+entry_not_touched_before_first_exit_under_touch_check: 215
+recorded_result_depends_on_intrabar_assumption: 4
+sl_and_tp_both_touched_same_m15_bar: 4
+
+HOW TO INTERPRET
+- This is a diagnostic OHLC scan, not an automatic replacement backtest.
+- M15 OHLC cannot reveal the order of SL and TP touches within the same candle.
+- Entry-touch flags are diagnostic; this script does not remove trades or change results.
+- The scan begins strictly after the recorded signal timestamp.
+- Inspect flagged rows before changing the strategy or training labels.
+
+Detail CSV: C:\Users\satya\Downloads\QuantEdge\QuantEdge-main\outputs\ml\xauusd_backtest_execution_audit.csv
+Report: C:\Users\satya\Downloads\QuantEdge\QuantEdge-main\outputs\ml\xauusd_backtest_execution_audit.txt

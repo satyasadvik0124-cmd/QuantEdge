@@ -1,0 +1,44 @@
+
+=================================
+QUANTEDGE ML SIGNAL MODEL V1
+=================================
+
+Model Type       : Logistic Regression
+Training Method  : Chronological split
+Train Ratio      : 70%
+Confidence Gate  : 0.55
+
+---------------------------------
+
+Closed Trades    : 487
+Train Trades     : 340
+Test Trades      : 147
+
+Train Accuracy   : 68.82%
+Train Precision  : 62.50%
+Train Recall     : 4.63%
+
+Test Accuracy    : 61.90%
+Test Precision   : 27.59%
+Test Recall      : 18.60%
+
+---------------------------------
+
+Baseline Trades  : 487
+Baseline Net R   : 268.00R
+Baseline PF      : 1.80
+
+ML Filter Trades : 28
+ML Filter Net R  : 27.00R
+ML Filter PF     : 2.59
+
+---------------------------------
+
+Saved Scores:
+../outputs/ml_signal_scores_v1.csv
+
+Important:
+This is a research baseline. Use walk-forward validation
+before trusting ML-filtered results.
+
+=================================

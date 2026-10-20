@@ -1,0 +1,3 @@
+outcome_transition,count
+LOSS -> WIN,91
+WIN -> LOSS,1

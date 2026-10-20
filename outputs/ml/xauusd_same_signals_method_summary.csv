@@ -1,0 +1,3 @@
+method,total_signals,wins,losses,open_after_entry,entry_never_touched,resolved_trades,win_rate_pct,net_R_excluding_unresolved,profit_factor,max_drawdown_R_trade_sequence
+original_result,487,151,336,0,0,487,31.01,268.0,1.7976,10.0
+entry_touch_result,487,257,230,0,0,487,52.77,798.0,4.4696,6.0

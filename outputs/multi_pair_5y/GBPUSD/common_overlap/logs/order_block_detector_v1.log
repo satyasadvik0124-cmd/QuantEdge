@@ -1,0 +1,20 @@
+
+Using: GBPUSD_M15
+
+===== ORDER BLOCK DETECTOR V1 =====
+
+CHOCH=2022-08-04 03:45:00 | TYPE=SSL_SWEEP | IDX=207
+CHOCH=2022-08-03 16:00:00 | TYPE=BSL_SWEEP | IDX=160
+CHOCH=2022-08-04 03:45:00 | TYPE=SSL_SWEEP | IDX=207
+CHOCH=2022-08-12 11:00:00 | TYPE=BSL_SWEEP | IDX=812
+CHOCH=2022-08-09 17:45:00 | TYPE=BSL_SWEEP | IDX=551
+
+===== ORDER BLOCK REPORT =====
+
+Bullish Order Blocks : 250
+Bearish Order Blocks : 243
+Total Order Blocks   : 493
+OB Conversion Rate   : 89.15%
+
+Saved:
+../outputs/order_blocks_v1.csv

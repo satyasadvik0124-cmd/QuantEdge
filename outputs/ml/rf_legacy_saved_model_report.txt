@@ -1,0 +1,18 @@
+EXPLORATORY RANDOM FOREST — SAVED MODEL
+================================================
+EXPLORATORY ONLY: legacy labels/timestamps have known alignment limitations.
+
+Rows used: 289
+Features used: 17
+Chronological holdout train/test: 202/87
+Holdout RF metrics: {"accuracy": 0.6666666666666666, "balanced_accuracy": 0.6315205327413984, "precision_win": 0.5925925925925926, "recall_win": 0.47058823529411764, "f1_win": 0.5245901639344263, "confusion_matrix_labels_0_1": [[42, 11], [18, 16]], "roc_auc": 0.7042175360710322}
+Holdout majority baseline: {"accuracy": 0.6091954022988506, "balanced_accuracy": 0.5, "precision_win": 0.0, "recall_win": 0.0, "f1_win": 0.0, "confusion_matrix_labels_0_1": [[53, 0], [34, 0]], "roc_auc": null}
+
+Saved artifacts:
+Model: C:\Users\satya\Downloads\QuantEdge\QuantEdge-main\outputs\ml\rf_legacy_model.joblib
+Feature schema: C:\Users\satya\Downloads\QuantEdge\QuantEdge-main\outputs\ml\rf_legacy_model_features.json
+Metrics: C:\Users\satya\Downloads\QuantEdge\QuantEdge-main\outputs\ml\rf_legacy_saved_model_metrics.json
+
+The saved model was refit on all 289 legacy rows for experimental scoring.
+Do not use its training fit as an unbiased performance estimate.
+Do not interpret its scores as calibrated real-world probabilities.

@@ -1,0 +1,12 @@
+
+Using: GBPUSD_M15
+
+===== SWEEP REPORT =====
+
+Bullish Sweeps : 1,873
+Bearish Sweeps : 2,010
+Total Sweeps   : 3,847
+Sweep Rate     : 97.71%
+
+Saved:
+../outputs/liquidity_sweeps_v2.csv

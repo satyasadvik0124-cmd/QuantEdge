@@ -1,0 +1,24 @@
+
+Using: XAUUSD_M15
+
+===== MARKET STRUCTURE V4 =====
+
+
+===== MARKET STRUCTURE REPORT =====
+
+Original Swings : 18,974
+Cleaned Swings  : 15,404
+Filtered Swings : 10,850
+
+Initial SH      : 1
+Initial SL      : 1
+
+HH Count        : 2,780
+HL Count        : 2,878
+LH Count        : 2,692
+LL Count        : 2,498
+
+Total Structure : 10,850
+Reduction Rate  : 42.82%
+
+Saved ../outputs/market_structure_v4.csv

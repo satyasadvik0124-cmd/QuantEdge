@@ -1,0 +1,27 @@
+{
+  "target": "target_tp_first",
+  "time_column": "signal_time",
+  "features": [
+    "rsi_14",
+    "macd_atr",
+    "macd_hist_atr",
+    "ema9_vs_ema21_atr",
+    "ema21_vs_ema50_atr",
+    "close_vs_ema9_atr",
+    "atr_14",
+    "adx_14",
+    "bb_position",
+    "return_1",
+    "return_4",
+    "return_16",
+    "candle_body_ratio",
+    "candle_direction",
+    "direction_buy",
+    "risk_distance",
+    "risk_distance_atr"
+  ],
+  "training_rows": 289,
+  "training_start": "2024-01-03 11:30:00",
+  "training_end": "2026-06-19 10:45:00",
+  "warning": "Legacy labels/timestamps are not validated; model scores are experimental."
+}

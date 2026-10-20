@@ -1,0 +1,6 @@
+model,test_trades,actual_wins,observed_win_rate_pct,accuracy_pct,balanced_accuracy_pct,precision_win_pct,recall_win_pct,f1_win_pct,roc_auc,average_precision,brier_score_lower_is_better,log_loss_lower_is_better,rank_brier,rank_auc,rank_average_precision,mean_diagnostic_rank
+Gradient Boosting,147,43,29.25,70.75,50.0,0.0,0.0,0.0,0.5228,0.3027,0.2075,0.6055,1.0,1.0,2.0,1.33
+Extra Trees,147,43,29.25,46.26,48.38,28.05,53.49,36.8,0.5112,0.3245,0.2489,0.6909,3.0,3.0,1.0,2.33
+Random Forest,147,43,29.25,50.34,51.95,30.77,55.81,39.67,0.5148,0.2915,0.2529,0.6995,4.0,2.0,3.0,3.0
+Prior baseline,147,43,29.25,70.75,50.0,0.0,0.0,0.0,0.3804,0.2348,0.2079,0.6066,2.0,5.0,5.0,4.0
+Logistic Regression,147,43,29.25,38.1,43.29,25.0,55.81,34.53,0.422,0.2833,0.2771,0.7759,5.0,4.0,4.0,4.33

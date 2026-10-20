@@ -1,0 +1,30 @@
+XAUUSD M15 RANDOM FOREST — CHRONOLOGICAL EVALUATION
+==========================================================
+Candle rows: 99970
+Signal/result rows verified: 487
+Eligible labeled rows: 487
+Rows excluded for feature availability/quality: 0
+WIN labels among eligible rows: 151
+LOSS labels among eligible rows: 336
+Train rows (earlier 80%): 389
+Test rows (latest 20%): 98
+Train period: 2022-07-29 15:45:00 to 2025-12-19 16:45:00
+Test period: 2026-01-02 16:00:00 to 2026-10-19 12:00:00
+
+TEST METRICS
+----------------------------------------------------------
+test_accuracy: 0.5816
+test_balanced_accuracy: 0.6029
+test_precision_win: 0.3800
+test_recall_win: 0.6552
+test_f1_win: 0.4810
+test_roc_auc: 0.5687
+test_brier_score: 0.2461
+
+Confusion matrix [rows=actual 0/1, columns=predicted 0/1]:
+[[38 31]
+ [10 19]]
+
+WARNING: The test period is chronological, but legacy labels and signal timestamps
+have not been independently validated. Treat scores as experimental, not calibrated
+probabilities. This script does not modify strategy rules or original backtest files.

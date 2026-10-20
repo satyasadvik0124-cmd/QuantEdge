@@ -4,32 +4,32 @@ QUANTEDGE PERFORMANCE REPORT
 =================================
 
 Initial Capital : $10,000.00
-Final Capital   : $25,100.00
+Final Capital   : $36,800.00
 
-Net Profit      : $15,100.00
-Return (%)      : 151.00%
+Net Profit      : $26,800.00
+Return (%)      : 268.00%
 
 ---------------------------------
 
-Total Trades : 289
+Total Trades : 487
 
-Wins         : 110
-Losses       : 179
+Wins         : 151
+Losses       : 336
 
-Win Rate     : 38.06%
+Win Rate     : 31.01%
 
-Average RR   : 0.52
+Average RR   : 0.55
 
-Gross Profit : 330.00R
-Gross Loss   : 179.00R
+Gross Profit : 604.00R
+Gross Loss   : 336.00R
 
-Profit Factor: 1.84
+Profit Factor: 1.80
 
-Net R        : 151.00R
+Net R        : 268.00R
 
-Max Win Streak  : 5
-Max Loss Streak : 9
+Max Win Streak  : 6
+Max Loss Streak : 10
 
-Expectancy   : 0.52R
+Expectancy   : 0.55R
 
 =================================

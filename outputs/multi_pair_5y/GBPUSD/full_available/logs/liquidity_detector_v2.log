@@ -1,0 +1,12 @@
+
+===== LIQUIDITY REPORT =====
+
+Pair                   : GBPUSD
+Tolerance              : 0.0002
+
+EQH Count              : 2,044
+EQL Count              : 1,934
+Raw Liquidity Levels   : 3,978
+Unique Liquidity Levels: 3,937
+
+Saved: ../outputs/liquidity_v2.csv

@@ -1,0 +1,25 @@
+warning: in the working copy of 'analysis/backtest_v1.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'analysis/bos_detector_v4.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'analysis/choch_detector_v3.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'analysis/data_inspector.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'analysis/debug_ob.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'analysis/debug_structure.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'analysis/drawdown_analyzer_v1.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'analysis/equity_curve_v1.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'analysis/fvg_detector_v2.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'analysis/liquidity_detector_v2.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'analysis/liquidity_sweep_detector_v2.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'analysis/market_structure_v4.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'analysis/order_block_detector_v1.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'analysis/performance_analyzer_v1.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'analysis/run_all.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'analysis/signal_flow_report.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'analysis/signal_generator_v3.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'analysis/swing_detector_v3.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'analysis/validated_sweeps_v2.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'config.py', LF will be replaced by CRLF the next time Git touches it
+ analysis/bos_detector_v4.py     | 717 [32m+++++++++++++++++++++++++++++++++++[m[31m-----[m
+ analysis/run_all.py             |   3 [32m+[m[31m-[m
+ analysis/signal_generator_v3.py | 159 [32m+++++++[m[31m--[m
+ config.py                       |  23 [32m+[m[31m-[m
+ 4 files changed, 768 insertions(+), 134 deletions(-)

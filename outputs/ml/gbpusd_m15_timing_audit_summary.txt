@@ -1,0 +1,25 @@
+TIMING-AWARE ML DATASET AUDIT
+Legacy trades: 289
+Component status:
+component_match_status
+HEURISTIC_MATCH    289
+
+Feature status:
+feature_status
+OK    289
+
+Entry touched after availability: 279
+
+Aligned outcome status:
+aligned_result
+LOSS                      143
+ENTRY_CANDLE_AMBIGUOUS     94
+WIN                        42
+NO_FUTURE_ENTRY_TOUCH      10
+
+Legacy outcomes:
+legacy_result
+LOSS    195
+WIN      94
+
+CAUTION: Component matching is heuristic and requires manual validation. This is an audit dataset, not yet a validated ML benchmark.

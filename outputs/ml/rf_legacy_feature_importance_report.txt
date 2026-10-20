@@ -1,0 +1,31 @@
+EXPLORATORY RANDOM FOREST — PERMUTATION FEATURE IMPORTANCE
+================================================================
+WARNING: Legacy labels/timestamps have known alignment limitations.
+Treat this as an exploratory diagnostic, not validated trading insight.
+
+Rows: 289
+Features tested: 18
+Chronological split: first 202 rows train, remaining 87 rows test
+Test period: 2025-10-02 03:45:00 to 2026-06-19 10:45:00
+Test ROC-AUC before permutation: 0.7159
+
+Top 10 features by mean ROC-AUC decrease after shuffling:
+ 1. return_16: mean AUC drop 0.06014 +/- 0.03477
+ 2. atr_14: mean AUC drop 0.02111 +/- 0.01772
+ 3. macd_atr: mean AUC drop 0.00716 +/- 0.00926
+ 4. ema21_vs_ema50_atr: mean AUC drop 0.00686 +/- 0.00799
+ 5. adx_14: mean AUC drop 0.00590 +/- 0.01851
+ 6. rsi_14: mean AUC drop 0.00307 +/- 0.00730
+ 7. bb_position: mean AUC drop 0.00305 +/- 0.01013
+ 8. ema9_vs_ema21_atr: mean AUC drop 0.00094 +/- 0.01105
+ 9. risk_distance_atr: mean AUC drop 0.00009 +/- 0.00363
+10. trade_id: mean AUC drop 0.00000 +/- 0.00000
+
+How to read this:
+- Larger positive values mean shuffling the feature reduced test ROC-AUC more.
+- Values near zero suggest little measurable contribution in this test set.
+- Negative values can occur due to noise or overfitting.
+- Correlated indicators can share or dilute importance.
+- Importance does not prove a feature causes better trading outcomes.
+
+Full ranked table: C:\Users\satya\Downloads\QuantEdge\QuantEdge-main\outputs\ml\rf_legacy_permutation_importance.csv

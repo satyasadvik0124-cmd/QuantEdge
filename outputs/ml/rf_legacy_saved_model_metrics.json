@@ -1,0 +1,77 @@
+{
+  "warning": "EXPLORATORY ONLY: legacy labels/timestamps have known alignment limitations.",
+  "rows_used": 289,
+  "features_used": [
+    "rsi_14",
+    "macd_atr",
+    "macd_hist_atr",
+    "ema9_vs_ema21_atr",
+    "ema21_vs_ema50_atr",
+    "close_vs_ema9_atr",
+    "atr_14",
+    "adx_14",
+    "bb_position",
+    "return_1",
+    "return_4",
+    "return_16",
+    "candle_body_ratio",
+    "candle_direction",
+    "direction_buy",
+    "risk_distance",
+    "risk_distance_atr"
+  ],
+  "feature_count": 17,
+  "train_rows_for_holdout_evaluation": 202,
+  "test_rows": 87,
+  "train_period": [
+    "2024-01-03 11:30:00",
+    "2025-10-01 06:30:00"
+  ],
+  "test_period": [
+    "2025-10-02 03:45:00",
+    "2026-06-19 10:45:00"
+  ],
+  "label_counts": {
+    "0": 195,
+    "1": 94
+  },
+  "holdout_random_forest_metrics": {
+    "accuracy": 0.6666666666666666,
+    "balanced_accuracy": 0.6315205327413984,
+    "precision_win": 0.5925925925925926,
+    "recall_win": 0.47058823529411764,
+    "f1_win": 0.5245901639344263,
+    "confusion_matrix_labels_0_1": [
+      [
+        42,
+        11
+      ],
+      [
+        18,
+        16
+      ]
+    ],
+    "roc_auc": 0.7042175360710322
+  },
+  "holdout_majority_baseline_metrics": {
+    "accuracy": 0.6091954022988506,
+    "balanced_accuracy": 0.5,
+    "precision_win": 0.0,
+    "recall_win": 0.0,
+    "f1_win": 0.0,
+    "confusion_matrix_labels_0_1": [
+      [
+        53,
+        0
+      ],
+      [
+        34,
+        0
+      ]
+    ],
+    "roc_auc": null
+  },
+  "saved_final_model_fit": "refit on all legacy rows for experimental scoring",
+  "model_file": "C:\\Users\\satya\\Downloads\\QuantEdge\\QuantEdge-main\\outputs\\ml\\rf_legacy_model.joblib",
+  "feature_schema_file": "C:\\Users\\satya\\Downloads\\QuantEdge\\QuantEdge-main\\outputs\\ml\\rf_legacy_model_features.json"
+}

@@ -1,0 +1,12 @@
+
+Using: XAUUSD_M15
+
+===== SWEEP REPORT =====
+
+Bullish Sweeps : 2,495
+Bearish Sweeps : 2,787
+Total Sweeps   : 5,281
+Sweep Rate     : 95.77%
+
+Saved:
+../outputs/liquidity_sweeps_v2.csv

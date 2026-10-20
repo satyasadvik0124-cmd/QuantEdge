@@ -1,0 +1,33 @@
+{
+  "instrument": "XAUUSD",
+  "timeframe": "M15",
+  "target": "target_tp_first",
+  "time_column": "signal_time",
+  "features": [
+    "rsi_14",
+    "macd_atr",
+    "macd_hist_atr",
+    "ema9_vs_ema21_atr",
+    "ema21_vs_ema50_atr",
+    "close_vs_ema9_atr",
+    "atr_14",
+    "adx_14",
+    "bb_position",
+    "return_1",
+    "return_4",
+    "return_16",
+    "candle_body_ratio",
+    "candle_direction",
+    "direction_buy",
+    "risk_distance",
+    "risk_distance_atr"
+  ],
+  "feature_candle_rule": "latest candle whose open time + 15 minutes <= signal_time",
+  "training_rows": 389,
+  "test_rows": 98,
+  "training_start": "2022-07-29 15:45:00",
+  "training_end": "2025-12-19 16:45:00",
+  "test_start": "2026-01-02 16:00:00",
+  "test_end": "2026-10-19 12:00:00",
+  "warning": "Experimental model. Legacy backtest outcomes and recorded signal timestamps have not been independently validated; scores are not calibrated win probabilities."
+}

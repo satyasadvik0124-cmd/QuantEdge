@@ -30,6 +30,8 @@ QuantEdge automates the complete trading research workflow, from swing detection
 
 ✅ Historical Backtesting Engine
 
+✅ Machine Learning Signal Scoring
+
 ✅ Equity Curve Generation
 
 ✅ Drawdown Analysis
@@ -73,8 +75,11 @@ Signal Generator
                 │
                 ▼
 Backtesting Engine
-                │
-                ▼
+       │
+       ▼
+ML Signal Scoring
+       │
+       ▼
 Equity Curve
                 │
                 ▼
@@ -189,6 +194,19 @@ Evaluates historical signal performance using:
 - Fixed Risk Model
 - 1:3 Risk Reward Ratio
 - TP / SL Simulation
+
+---
+
+## ML Signal Model V1
+
+Trains a lightweight logistic regression model on closed historical trades to estimate the probability that each generated signal becomes a winning trade.
+
+Outputs:
+
+- ML win probability
+- ML trade/no-trade filter
+- Train/test accuracy, precision, and recall
+- Baseline vs ML-filtered Net R and Profit Factor
 
 ---
 

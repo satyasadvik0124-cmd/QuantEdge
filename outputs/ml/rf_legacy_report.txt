@@ -1,0 +1,57 @@
+EXPLORATORY RANDOM FOREST — LEGACY LABELS
+================================================
+EXPLORATORY ONLY: labels come from the legacy backtest and signal timestamps were flagged by the timing audit. These are not validated predictive metrics.
+
+Rows used: 289
+Numeric features used: 18
+Train rows: 202 | Test rows: 87
+Train period: 2024-01-03 11:30:00 to 2025-10-01 06:30:00
+Test period: 2025-10-02 03:45:00 to 2026-06-19 10:45:00
+Overall labels: {'0': 195, '1': 94}
+Test labels: {'0': 53, '1': 34}
+
+Random Forest metrics:
+{
+  "accuracy": 0.6781609195402298,
+  "balanced_accuracy": 0.6620421753607103,
+  "precision_win": 0.5882352941176471,
+  "recall_win": 0.5882352941176471,
+  "f1_win": 0.5882352941176471,
+  "confusion_matrix_labels_0_1": [
+    [
+      39,
+      14
+    ],
+    [
+      14,
+      20
+    ]
+  ],
+  "roc_auc": 0.7158712541620422
+}
+
+Majority baseline metrics:
+{
+  "accuracy": 0.6091954022988506,
+  "balanced_accuracy": 0.5,
+  "precision_win": 0.0,
+  "recall_win": 0.0,
+  "f1_win": 0.0,
+  "confusion_matrix_labels_0_1": [
+    [
+      53,
+      0
+    ],
+    [
+      34,
+      0
+    ]
+  ],
+  "roc_auc": null
+}
+
+Test predictions saved to: C:\Users\satya\Downloads\QuantEdge\QuantEdge-main\outputs\ml\rf_legacy_test_predictions.csv
+Metrics JSON saved to: C:\Users\satya\Downloads\QuantEdge\QuantEdge-main\outputs\ml\rf_legacy_metrics.json
+
+Do not interpret estimated win probabilities as calibrated probabilities yet.
+Do not use this experiment to claim validated trading performance.

@@ -1,0 +1,6 @@
+pair,confidence_band,signals_scored,resolved_trades,wins,losses,win_rate_pct,net_R,profit_factor,max_drawdown_R_trade_sequence,unresolved_or_unmatched,mean_model_score_pct
+GBPUSD,ALL SCORED (baseline),393,392,195,197,49.74,583.0,3.9594,9.0,1,49.04
+GBPUSD,<40%,68,68,29,39,42.65,77.0,2.9744,6.0,0,35.3
+GBPUSD,40–<50%,139,139,70,69,50.36,211.0,4.058,8.0,0,45.27
+GBPUSD,50–<60%,136,135,62,73,45.93,175.0,3.3973,7.0,1,54.43
+GBPUSD,≥60%,50,50,34,16,68.0,120.0,8.5,3.0,0,63.53

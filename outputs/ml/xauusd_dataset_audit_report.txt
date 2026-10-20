@@ -1,0 +1,63 @@
+QUANTEDGE XAUUSD M15 DATASET AUDIT
+====================================================================
+Project root: C:\Users\satya\Downloads\QuantEdge\QuantEdge-main
+
+ROW COUNTS
+Candles: 99,970
+Signals: 487
+Backtest results: 487
+ML feature rows: 487
+Candle date range: 2022-07-18 13:45:00 to 2026-10-19 15:15:00
+
+COLUMN DETECTION
+Candles:
+  time: time
+Signals:
+  time: signal_time
+  direction: direction
+  entry: entry
+  sl: sl
+  tp: tp
+Results:
+  time: signal_time
+  direction: direction
+  entry: entry
+  sl: sl
+  tp: tp
+  result: result
+  rr: rr
+Features:
+  time: signal_time
+  candle_time: feature_candle_time
+  target: target_tp_first
+  status: feature_status
+
+DUPLICATES
+Signals duplicated timestamps: 0
+Results duplicated timestamps: 0
+Features duplicated timestamps: 0
+
+BACKTEST OUTCOME DISTRIBUTION
+LOSS: 336
+WIN: 151
+
+SIGNAL-LEVEL CHECKS
+Clean rows: 487 / 487
+Rows with issues: 0 / 487
+No signal-level issues detected by these checks.
+
+FEATURE DATA QUALITY
+Status OK: 487
+Schema feature columns present: 17 / 17
+Rows with any missing schema feature: 0
+Missing numeric feature cells: 0
+Rows with infinite feature values: 0
+
+LIMITATIONS
+- This is a consistency audit, not proof that backtest execution is correct.
+- Exact candle timestamp matches depend on the source timestamp convention.
+- A feature candle before signal time is necessary but does not alone prove no leakage.
+- Existing source files, signals, backtest results, and models were not modified.
+
+Audit detail CSV: C:\Users\satya\Downloads\QuantEdge\QuantEdge-main\outputs\ml\xauusd_dataset_audit_rows.csv
+Audit report: C:\Users\satya\Downloads\QuantEdge\QuantEdge-main\outputs\ml\xauusd_dataset_audit_report.txt

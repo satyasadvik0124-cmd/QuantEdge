@@ -1,0 +1,12 @@
+
+===== LIQUIDITY REPORT =====
+
+Pair                   : XAUUSD
+Tolerance              : 2.0
+
+EQH Count              : 2,787
+EQL Count              : 2,534
+Raw Liquidity Levels   : 5,321
+Unique Liquidity Levels: 5,310
+
+Saved: ../outputs/liquidity_v2.csv

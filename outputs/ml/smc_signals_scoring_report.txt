@@ -1,0 +1,16 @@
+SMC SIGNAL ML CONFIDENCE SCORING — EXPERIMENTAL
+========================================================
+Original strategy/backtest files were not modified.
+Scores are not calibrated real-world probabilities; legacy labels have timing limitations.
+This first pass scores historical records in backtest_results_v1.csv, not live signals.
+
+Input signals: 289
+Scored records: 289
+Unscored records: 0
+Feature status counts: {'OK': 289}
+Mean estimated win score: 0.4704
+Median estimated win score: 0.5055
+Scores >= 50% (experimental threshold only): 148
+
+Output CSV: C:\Users\satya\Downloads\QuantEdge\QuantEdge-main\outputs\ml\smc_signals_with_ml_confidence.csv
+Report: C:\Users\satya\Downloads\QuantEdge\QuantEdge-main\outputs\ml\smc_signals_scoring_report.txt

@@ -1,0 +1,24 @@
+
+Using: GBPUSD_M15
+
+===== MARKET STRUCTURE V4 =====
+
+
+===== MARKET STRUCTURE REPORT =====
+
+Original Swings : 18,632
+Cleaned Swings  : 14,960
+Filtered Swings : 12,791
+
+Initial SH      : 1
+Initial SL      : 1
+
+HH Count        : 3,181
+HL Count        : 3,230
+LH Count        : 3,238
+LL Count        : 3,140
+
+Total Structure : 12,791
+Reduction Rate  : 31.35%
+
+Saved ../outputs/market_structure_v4.csv

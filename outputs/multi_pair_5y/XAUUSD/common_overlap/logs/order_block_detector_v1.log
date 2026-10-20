@@ -1,0 +1,20 @@
+
+Using: XAUUSD_M15
+
+===== ORDER BLOCK DETECTOR V1 =====
+
+CHOCH=2022-08-03 20:45:00 | TYPE=SSL_SWEEP | IDX=171
+CHOCH=2022-08-11 18:00:00 | TYPE=BSL_SWEEP | IDX=712
+CHOCH=2022-08-29 16:30:00 | TYPE=SSL_SWEEP | IDX=1810
+CHOCH=2022-09-16 16:30:00 | TYPE=BSL_SWEEP | IDX=3088
+CHOCH=2022-09-16 16:30:00 | TYPE=BSL_SWEEP | IDX=3088
+
+===== ORDER BLOCK REPORT =====
+
+Bullish Order Blocks : 213
+Bearish Order Blocks : 245
+Total Order Blocks   : 458
+OB Conversion Rate   : 80.49%
+
+Saved:
+../outputs/order_blocks_v1.csv

@@ -1,0 +1,60 @@
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'archive/data/EURUSD_H1.csv', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'archive/data/EURUSD_M5.csv', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'archive/data/GBPUSD_H1.csv', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'archive/data/GBPUSD_M15.csv', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'archive/data/GBPUSD_M5.csv', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'archive/data/XAUUSD_H1.csv', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'archive/data/XAUUSD_M15.csv', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'archive/data/XAUUSD_M5.csv', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'archive/debug/check_order_blocks.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'archive/debug/debug_data.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'archive/debug/debug_report_v1.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'archive/debug/test_config.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'archive/debug/test_fvg.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'archive/debug/xauusd_debug.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'archive/detectors/bos_detector_v1.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'archive/detectors/bos_detector_v2.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'archive/detectors/bos_detector_v3.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'archive/detectors/choch_detector_v1.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'archive/detectors/choch_detector_v2.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'archive/detectors/fvg_detector_v1.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'archive/detectors/liquidity_detector_v1.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'archive/detectors/liquidity_sweep_detector_v1.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'archive/detectors/market_structure_v1.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'archive/detectors/market_structure_v2.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'archive/detectors/market_structure_v3.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'archive/detectors/signal_generator_v1.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'archive/detectors/signal_generator_v2.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'archive/detectors/swing_detector_v1.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'archive/detectors/swing_detector_v2.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'archive/detectors/validated_sweeps_v1.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'archive/outputs/fvg_v1.csv', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'archive/outputs/liquidity_sweeps_v1.csv', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'archive/outputs/liquidity_v1.csv', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'archive/outputs/signals_v1.csv', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'archive/outputs/signals_v2.csv', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'archive/outputs/validated_sweeps_v1.csv', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'collectors/mt5_collector.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'data/EURUSD_M15.csv', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'data/EURUSD_M15_2Y.csv', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'data/GBPUSD_M15_2Y.csv', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'data/XAUUSD_M15_2Y.csv', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/QuantEdgeV1_report.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/project_progress.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'main.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'outputs/bos_events_v4.csv', LF will be replaced by CRLF the next time Git touches it
+ README.md                       |    24 [32m+[m[31m-[m
+ collectors/mt5_collector.py     |   591 [32m+[m[31m-[m
+ outputs/backtest_results_v1.csv |   776 [32m+[m[31m-[m
+ outputs/choch_events.csv        |  5090 [32m+++++[m[31m----[m
+ outputs/equity_curve.csv        |   764 [32m+[m[31m-[m
+ outputs/fvg_v2.csv              | 23307 [32m++++++++++++++++++++++++++++++++++[m[31m----[m
+ outputs/liquidity_sweeps_v2.csv |  7724 [32m+++++++++[m[31m----[m
+ outputs/liquidity_v2.csv        |  8014 [32m+++++++++[m[31m----[m
+ outputs/market_structure_v4.csv | 18383 [32m++++++++++++++++++[m[31m------------[m
+ outputs/order_blocks_v1.csv     |   776 [32m+[m[31m-[m
+ outputs/performance_report.txt  |    30 [32m+[m[31m-[m
+ outputs/signals_v3.csv          |   776 [32m+[m[31m-[m
+ outputs/validated_sweeps_v2.csv |   931 [32m+[m[31m-[m
+ 13 files changed, 48579 insertions(+), 18607 deletions(-)

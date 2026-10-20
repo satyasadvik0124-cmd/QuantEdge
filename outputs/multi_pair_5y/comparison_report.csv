@@ -1,0 +1,5 @@
+pair,period,candles,start,end,signals,backtest_rows,wins,losses,open,win_rate_pct,net_R,profit_factor,max_drawdown_R,run_directory
+GBPUSD,full_available,100757,2022-08-02 00:00:00,2026-08-21 11:45:00,493,493,151,341,1,30.69,263.0,1.7713,16.0,C:\Users\satya\Downloads\QuantEdge\QuantEdge-main\outputs\multi_pair_5y\GBPUSD\full_available
+GBPUSD,common_overlap,100757,2022-08-02 00:00:00,2026-08-21 11:45:00,493,493,151,341,1,30.69,263.0,1.7713,16.0,C:\Users\satya\Downloads\QuantEdge\QuantEdge-main\outputs\multi_pair_5y\GBPUSD\common_overlap
+XAUUSD,full_available,99970,2022-07-18 13:45:00,2026-10-19 15:15:00,487,487,151,336,0,31.01,268.0,1.7976,10.0,C:\Users\satya\Downloads\QuantEdge\QuantEdge-main\outputs\multi_pair_5y\XAUUSD\full_available
+XAUUSD,common_overlap,95393,2022-08-02 01:00:00,2026-08-21 11:45:00,458,458,141,317,0,30.79,247.0,1.7792,10.0,C:\Users\satya\Downloads\QuantEdge\QuantEdge-main\outputs\multi_pair_5y\XAUUSD\common_overlap

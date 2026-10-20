@@ -1,0 +1,6 @@
+pair,confidence_band,signals_scored,resolved_trades,wins,losses,win_rate_pct,net_R,profit_factor,max_drawdown_R_trade_sequence,unresolved_or_unmatched,mean_model_score_pct
+XAUUSD,ALL SCORED (baseline),387,387,210,177,54.26,663.0,4.7458,6.0,0,49.43
+XAUUSD,<40%,61,61,30,31,49.18,89.0,3.871,5.0,0,33.57
+XAUUSD,40–<50%,134,134,75,59,55.97,241.0,5.0847,7.0,0,45.79
+XAUUSD,50–<60%,147,147,75,72,51.02,228.0,4.1667,6.0,0,54.44
+XAUUSD,≥60%,45,45,30,15,66.67,105.0,8.0,2.0,0,65.4

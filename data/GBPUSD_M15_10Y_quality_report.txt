@@ -1,0 +1,38 @@
+GBPUSD M15 TEN-YEAR HISTORICAL DATA QUALITY REPORT
+=======================================================
+Server: MetaQuotes-Demo
+MT5 symbol: GBPUSD
+Timeframe: M15
+Requested start UTC: 2016-10-21 20:15:05.330343
+Requested end UTC: 2026-10-19 20:15:05.330343
+Actual first candle: 2022-10-10 08:45:00
+Actual last candle: 2026-10-19 14:45:00
+Rows saved: 99,966
+Approximate calendar span in years: 4.03
+Duplicate timestamps after cleanup: 0
+Transitions greater than 15 minutes: 231
+
+Largest timestamp gaps (may be normal market closures):
+0 days 00:30:00: 7 transitions
+0 days 01:00:00: 1 transitions
+0 days 01:15:00: 2 transitions
+0 days 02:00:00: 1 transitions
+0 days 03:00:00: 1 transitions
+0 days 05:30:00: 1 transitions
+0 days 06:15:00: 1 transitions
+0 days 09:00:00: 1 transitions
+0 days 12:00:00: 1 transitions
+0 days 21:45:00: 1 transitions
+1 days 00:00:00: 1 transitions
+1 days 00:15:00: 3 transitions
+2 days 00:15:00: 191 transitions
+2 days 01:15:00: 15 transitions
+2 days 02:00:00: 1 transitions
+2 days 07:15:00: 1 transitions
+2 days 09:15:00: 1 transitions
+3 days 00:15:00: 1 transitions
+
+Caveats:
+- This report does not assume every gap is a missing candle.
+- Weekends, holidays, broker sessions and terminal history limits affect coverage.
+- Compare this dataset with the existing GBPUSD files before using it in backtests.

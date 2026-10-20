@@ -1,0 +1,91 @@
+{
+  "warning": "EXPLORATORY ONLY: labels come from the legacy backtest and signal timestamps were flagged by the timing audit. These are not validated predictive metrics.",
+  "dataset_path": "C:\\Users\\satya\\Downloads\\QuantEdge\\QuantEdge-main\\outputs\\ml\\gbpusd_m15_technical_features_legacy.csv",
+  "rows_used": 289,
+  "feature_count": 18,
+  "features": [
+    "trade_id",
+    "rsi_14",
+    "macd_atr",
+    "macd_hist_atr",
+    "ema9_vs_ema21_atr",
+    "ema21_vs_ema50_atr",
+    "close_vs_ema9_atr",
+    "atr_14",
+    "adx_14",
+    "bb_position",
+    "return_1",
+    "return_4",
+    "return_16",
+    "candle_body_ratio",
+    "candle_direction",
+    "direction_buy",
+    "risk_distance",
+    "risk_distance_atr"
+  ],
+  "train_rows": 202,
+  "test_rows": 87,
+  "chronological_train_period": {
+    "start": "2024-01-03 11:30:00",
+    "end": "2025-10-01 06:30:00"
+  },
+  "chronological_test_period": {
+    "start": "2025-10-02 03:45:00",
+    "end": "2026-06-19 10:45:00"
+  },
+  "overall_label_counts": {
+    "0": 195,
+    "1": 94
+  },
+  "train_label_counts": {
+    "0": 142,
+    "1": 60
+  },
+  "test_label_counts": {
+    "0": 53,
+    "1": 34
+  },
+  "random_forest": {
+    "accuracy": 0.6781609195402298,
+    "balanced_accuracy": 0.6620421753607103,
+    "precision_win": 0.5882352941176471,
+    "recall_win": 0.5882352941176471,
+    "f1_win": 0.5882352941176471,
+    "confusion_matrix_labels_0_1": [
+      [
+        39,
+        14
+      ],
+      [
+        14,
+        20
+      ]
+    ],
+    "roc_auc": 0.7158712541620422
+  },
+  "majority_class_baseline": {
+    "accuracy": 0.6091954022988506,
+    "balanced_accuracy": 0.5,
+    "precision_win": 0.0,
+    "recall_win": 0.0,
+    "f1_win": 0.0,
+    "confusion_matrix_labels_0_1": [
+      [
+        53,
+        0
+      ],
+      [
+        34,
+        0
+      ]
+    ],
+    "roc_auc": null
+  },
+  "model_settings": {
+    "n_estimators": 400,
+    "max_depth": 4,
+    "min_samples_leaf": 8,
+    "class_weight": "balanced",
+    "random_state": 42
+  }
+}

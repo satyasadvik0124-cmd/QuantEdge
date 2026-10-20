@@ -1,0 +1,27 @@
+QuantEdge V1 vs Entry-Touch Scenario Comparison
+================================================
+
+This is a diagnostic comparison, not proof that the alternative is the correct execution model.
+Alternative assumption: BUY limit entry fills when low <= entry; SELL limit entry fills when high >= entry.
+SL/TP checks begin on the candle AFTER entry-touch candle to avoid assuming intrabar order.
+Both SL and TP on the same exit-check candle are treated as LOSS.
+
+Signals loaded: 487
+Original result rows matched: 487
+Same outcome: 394
+Changed outcome/status: 93
+Not matched to original result: 0
+
+Original matched outcomes:
+  Wins: 151
+  Losses: 336
+  Resolved-trade win rate: 31.01%
+
+Alternative entry-touch scenario:
+  Wins: 244
+  Losses: 243
+  Open after entry: 0
+  Entry never touched: 0
+  Resolved-trade win rate: 50.10%
+
+Detailed comparison CSV: C:\Users\satya\Downloads\QuantEdge\QuantEdge-main\outputs\ml\backtest_v1_vs_entry_touch_comparison.csv

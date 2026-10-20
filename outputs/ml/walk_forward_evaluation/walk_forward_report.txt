@@ -1,0 +1,27 @@
+QUANTEDGE — LEAKAGE-AWARE WALK-FORWARD ML CONFIDENCE EVALUATION
+========================================================================
+Each prediction is trained only on prior signals with resolved outcomes whose exit time is strictly before the prediction signal time.
+Minimum prior resolved training trades: 100
+Feature timing: only candles whose close time is <= signal_time.
+Outcome matching: signal_time + direction + entry + SL + TP composite key.
+Outcome: existing Entry-Touch result (WIN=+4R, LOSS=-1R).
+Entry-Touch method skips SL/TP checks on the entry-touch candle.
+Scores are raw model scores, not calibrated probabilities.
+Max drawdown is a signal-order diagnostic; it is not a portfolio simulation for overlapping trades.
+Do not filter live trades based on this exploratory evaluation alone.
+
+Summary by pair and confidence band:
+  pair       confidence_band  signals_scored  resolved_trades  wins  losses  win_rate_pct  net_R  profit_factor  max_drawdown_R_trade_sequence  unresolved_or_unmatched  mean_model_score_pct
+GBPUSD ALL SCORED (baseline)             393              392   195     197         49.74  583.0         3.9594                            9.0                        1                 49.04
+GBPUSD                  <40%              68               68    29      39         42.65   77.0         2.9744                            6.0                        0                 35.30
+GBPUSD               40–<50%             139              139    70      69         50.36  211.0         4.0580                            8.0                        0                 45.27
+GBPUSD               50–<60%             136              135    62      73         45.93  175.0         3.3973                            7.0                        1                 54.43
+GBPUSD                  ≥60%              50               50    34      16         68.00  120.0         8.5000                            3.0                        0                 63.53
+XAUUSD ALL SCORED (baseline)             387              387   210     177         54.26  663.0         4.7458                            6.0                        0                 49.43
+XAUUSD                  <40%              61               61    30      31         49.18   89.0         3.8710                            5.0                        0                 33.57
+XAUUSD               40–<50%             134              134    75      59         55.97  241.0         5.0847                            7.0                        0                 45.79
+XAUUSD               50–<60%             147              147    75      72         51.02  228.0         4.1667                            6.0                        0                 54.44
+XAUUSD                  ≥60%              45               45    30      15         66.67  105.0         8.0000                            2.0                        0                 65.40
+
+Combined predictions: C:\Users\satya\Downloads\QuantEdge\QuantEdge-main\outputs\ml\walk_forward_evaluation\all_pairs_walk_forward_predictions.csv
+Combined summary: C:\Users\satya\Downloads\QuantEdge\QuantEdge-main\outputs\ml\walk_forward_evaluation\all_pairs_walk_forward_band_summary.csv

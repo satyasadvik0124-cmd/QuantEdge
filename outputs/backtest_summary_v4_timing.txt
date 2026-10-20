@@ -1,0 +1,21 @@
+Asset: GBPUSD_M15
+Historical file: C:\Users\satya\Downloads\QuantEdge\QuantEdge-main\data\GBPUSD_M15_2Y.csv
+Candidate signals: 281
+Resolved trades (WIN/LOSS): 281
+Wins: 46
+Losses: 235
+Open at end of data: 0
+Invalid/unprocessed: 0
+Win rate (resolved only): 16.37%
+Gross profit (R): 184.00
+Gross loss (R): 235.00
+Net R (resolved only): -51.00
+Average R per resolved trade: -0.181
+Profit factor: 0.7829787234042311
+
+Caveats:
+- Entry is approximated by M15 candle range touch, not tick-level execution.
+- If SL and TP both occur in one candle, SL is assumed first.
+- Open trades are excluded from resolved-trade statistics.
+- Each signal is evaluated independently; overlapping trades are not netted.
+- Results are research estimates, not proof of live execution performance.

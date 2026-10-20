@@ -1,0 +1,30 @@
+WALK-FORWARD SCORE THRESHOLD DIAGNOSTIC
+================================================
+These are associations with legacy labels, NOT strategy backtest results.
+The legacy labels/timestamps have known alignment limitations.
+Do not select a threshold based only on this small sample.
+
+Walk-forward records: 87
+Overall legacy-label win rate: 39.08%
+
+Threshold summary:
+                                  group  trades  coverage_pct  legacy_label_wins  legacy_label_win_rate_pct  mean_score_pct
+All walk-forward predictions (baseline)      87        100.00                 34                      39.08           43.74
+                           Score >= 40%      48         55.17                 24                      50.00           54.33
+                           Score >= 45%      41         47.13                 23                      56.10           56.34
+                           Score >= 50%      32         36.78                 19                      59.38           58.90
+                           Score >= 55%      23         26.44                 13                      56.52           61.44
+                           Score >= 60%      13         14.94                 10                      76.92           64.28
+                           Score >= 65%       3          3.45                  1                      33.33           68.69
+                           Score >= 70%       1          1.15                  0                       0.00           70.80
+
+Score bands:
+score_band  trades  legacy_label_wins  mean_score_pct  observed_label_win_rate_pct
+    0-<40%      39                 10           30.70                        25.64
+   40-<50%      16                  5           45.18                        31.25
+   50-<60%      19                  9           55.22                        47.37
+   60-<70%      12                 10           63.74                        83.33
+   70-100%       1                  0           70.80                         0.00
+
+CSV: C:\Users\satya\Downloads\QuantEdge\QuantEdge-main\outputs\ml\rf_walk_forward_threshold_analysis.csv
+Report: C:\Users\satya\Downloads\QuantEdge\QuantEdge-main\outputs\ml\rf_walk_forward_threshold_analysis.txt
